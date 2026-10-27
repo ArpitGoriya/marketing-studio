@@ -1,0 +1,244 @@
+{
+  "name": "Anokhi Reet",
+  "about": "An ethnic-wear rental and shopping app in India: rent or buy outfits for weddings and festivals, from local shops and vendors, by city.",
+  "tagline": {
+    "text": "दिल से जुड़ी एक अनोखी रीत",
+    "font": "Arya",
+    "note": "The Hindi tagline, always in Arya, often in the gold gradient."
+  },
+  "colors": {
+    "red": {
+      "hex": "#890304",
+      "use": "the brand colour: headlines on cream, buttons, the wordmark"
+    },
+    "red-dark": {
+      "hex": "#4a0002",
+      "use": "deep backgrounds, the maroon ground's darker end"
+    },
+    "maroon-deep": {
+      "hex": "#2b0001",
+      "use": "the darkest maroon, for depth"
+    },
+    "cream": {
+      "hex": "#FFF2DF",
+      "use": "the main light ground, and text on maroon"
+    },
+    "beige": {
+      "hex": "#E8E5C3",
+      "use": "soft panels and borders"
+    },
+    "gold-tan": {
+      "hex": "#D6B97A",
+      "use": "accents, small labels on maroon"
+    },
+    "gold": {
+      "hex": "#F8D36A",
+      "use": "highlights inside gold gradients"
+    },
+    "brown-dark": {
+      "hex": "#7A5C2E",
+      "use": "quiet text on cream"
+    },
+    "text": {
+      "hex": "#1A1A1A",
+      "use": "body text"
+    },
+    "text-light": {
+      "hex": "#767676",
+      "use": "secondary text"
+    },
+    "white": {
+      "hex": "#FFFFFF",
+      "use": "cards on cream, like the app"
+    }
+  },
+  "gradients": {
+    "maroon": {
+      "css": "linear-gradient(135deg, #9A0000 0%, #5D0000 100%)",
+      "use": "the maroon ground for title and brand moments"
+    },
+    "maroon-deeper": {
+      "css": "linear-gradient(180deg, #570000 0%, #3B0000 100%)"
+    },
+    "cream": {
+      "css": "linear-gradient(135deg, #F5E6C8 0%, #E8D3A5 100%)"
+    },
+    "gold": {
+      "css": "linear-gradient(90deg, #A16F35 0%, #F8D36A 18%, #F8D36A 72%, #9A6A36 100%)",
+      "use": "gold text and lines (background-clip: text)"
+    },
+    "tagline-gold": {
+      "css": "linear-gradient(90deg, #F8B97A 0%, #E0B073 25%, #B98A3F 38%, #EBB97A 56%, #BB897A 80%, #80533A 100%)",
+      "use": "the site's tagline gold"
+    }
+  },
+  "fonts": [
+    {
+      "family": "Playfair Display",
+      "files": [
+        "fonts/PlayfairDisplay-Variable.ttf",
+        "fonts/PlayfairDisplay-Italic-Variable.ttf"
+      ],
+      "weights": "400-900",
+      "use": "headlines (italic for one emphasised word)"
+    },
+    {
+      "family": "Inter",
+      "files": [
+        "fonts/Inter-Variable.ttf",
+        "fonts/Inter-Italic-Variable.ttf"
+      ],
+      "weights": "100-900",
+      "use": "body, labels, captions, buttons"
+    },
+    {
+      "family": "Arya",
+      "files": [
+        "fonts/Arya-Regular.ttf"
+      ],
+      "weights": "400",
+      "use": "Hindi (Devanagari) text and the tagline"
+    }
+  ],
+  "logos": {
+    "wordmark": {
+      "file": "logos/logo-text.svg",
+      "ground": "dark",
+      "use": "ANOKHI REET wordmark. The file is beige for maroon grounds; on cream use brand:wordmark?color=red"
+    },
+    "seal": {
+      "file": "logos/logo-icon.svg",
+      "ground": "dark",
+      "use": "the round seal, beige, for maroon grounds"
+    },
+    "seal-on-maroon": {
+      "file": "logos/seal-on-maroon.svg",
+      "ground": "light",
+      "use": "the seal already on a maroon disc, for any ground"
+    },
+    "app-icon": {
+      "file": "logos/app-icon.png",
+      "ground": "light",
+      "use": "the app icon"
+    },
+    "lockup-maroon": {
+      "file": "logos/lockup-maroon.svg",
+      "ground": "light",
+      "use": "seal + wordmark in maroon, for cream/light grounds"
+    },
+    "lockup-shops": {
+      "file": "logos/lockup-shops.svg",
+      "ground": "dark",
+      "use": "Anokhi Reet SHOPS lockup (light wordmark, gold SHOPS) for maroon grounds"
+    },
+    "lockup-shops-dark": {
+      "file": "logos/lockup-shops-dark.svg",
+      "ground": "light",
+      "use": "Anokhi Reet SHOPS lockup in maroon, for cream/light grounds"
+    },
+    "lockup-vendors": {
+      "file": "logos/lockup-vendors.svg",
+      "ground": "dark",
+      "use": "Anokhi Reet VENDORS lockup (light wordmark, gold VENDORS) for maroon grounds"
+    },
+    "lockup-vendors-dark": {
+      "file": "logos/lockup-vendors-dark.svg",
+      "ground": "light",
+      "use": "Anokhi Reet VENDORS lockup in maroon, for cream/light grounds"
+    },
+    "app-store": {
+      "file": "logos/app-store-badge.svg",
+      "use": "official App Store badge, unaltered, with 'Download the app'",
+      "ground": "light"
+    },
+    "google-play": {
+      "file": "logos/google-play-badge.svg",
+      "use": "official Google Play badge, unaltered",
+      "ground": "light"
+    },
+    "pro-badge": {
+      "file": "logos/badge-pro.svg",
+      "use": "the Vendor Pro badge",
+      "ground": "light"
+    }
+  },
+  "patterns": {
+    "mandala": {
+      "file": "patterns/mandala.png",
+      "use": "the brand mandala, large and faint behind brand moments (opacity 0.06-0.15)"
+    },
+    "mandala-tile": {
+      "file": "patterns/mandala-pattern.webp",
+      "use": "a repeating mandala texture"
+    },
+    "ring": {
+      "file": "patterns/ring.svg",
+      "use": "the seal's ring, as a rotating or rippling ornament"
+    },
+    "corner": {
+      "file": "patterns/corner-pattern.png",
+      "use": "a decorative corner"
+    },
+    "floral-border": {
+      "file": "patterns/floral-border.png",
+      "use": "a floral border strip"
+    }
+  },
+  "rules": [
+    "Two grounds only: warm cream for most slides and scenes, the maroon gradient for title and brand moments. No other backgrounds, no generic glows or neon gradients.",
+    "Colours only from this palette and its gradients. Shadows are soft and maroon-tinted (e.g. 0 20px 60px rgba(74,0,2,0.18)), never hard black.",
+    "Playfair Display for headlines, Inter for everything else, Arya for Hindi. Keep body text at normal letter spacing; big headlines may tighten a little; small uppercase labels may track out.",
+    "Copy short and balanced: a few words per line, one idea per slide or scene.",
+    "App screens appear inside a phone frame (draw a rounded black bezel around the capture), never as floating cut-out screenshots. Small rebuilt pieces (a chip, a card) are fine for close-ups.",
+    "Show a detail by zooming into the phone in one smooth move; point at a button with a soft highlight or a fingertip shadow, never a cartoon hand or an outlined circle.",
+    "Patterns from our own circle family only: the mandala, the seal ring, rosettes, bandhani dots. Never other brands' motifs (no arches or jharokhas).",
+    "Logos are never stretched, outlined, recoloured outside the palette or given effects. End with the wordmark and, when inviting downloads, 'Download the app' with the official store badges.",
+    "No dead air in videos: something new every second or so. Text lands on the cut.",
+    "9:16 (Reels/Stories): keep text and key content out of the top 270 px and bottom 350 px (the app's UI covers them), and away from the right edge buttons.",
+    "Sound: a supplied voiceover and/or music; no swish, whoosh or riser effects."
+  ],
+  "never_say": [
+    {
+      "pattern": "(₹|\\bRs\\.?\\s?\\d|\\bINR\\b|\\brupees?\\b)",
+      "flags": "i",
+      "why": "No prices in our own words (real app screens may show them)."
+    },
+    {
+      "pattern": "\\b\\d[\\d,.]*\\s?(\\+|k\\+|lakh|crore)",
+      "flags": "i",
+      "why": "No number claims like \"2000+\" or \"1 lakh+\"."
+    },
+    {
+      "pattern": "\\d+(\\.\\d+)?\\s?%",
+      "flags": "",
+      "why": "No discount or percentage claims."
+    },
+    {
+      "pattern": "\\b(cheapest|lowest price|best price|guaranteed|no\\.? ?1|number one|#1)\\b",
+      "flags": "i",
+      "why": "No superlatives or guarantees."
+    }
+  ],
+  "sizes": {
+    "instagram-portrait": [
+      1080,
+      1350
+    ],
+    "instagram-square": [
+      1080,
+      1080
+    ],
+    "story-reel": [
+      1080,
+      1920
+    ],
+    "landscape-video": [
+      1920,
+      1080
+    ],
+    "link-post": [
+      1200,
+      628
+    ]
+  }
+}

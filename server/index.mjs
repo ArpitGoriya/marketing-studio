@@ -8,7 +8,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { closeBrowser } from './engine/browser.mjs';
 import { INSTRUCTIONS } from './instructions.mjs';
 import { VERSION } from './paths.mjs';
+import { registerBrand } from './tools/brand.mjs';
 import { registerCapture } from './tools/capture.mjs';
+import { registerExport } from './tools/export.mjs';
+import { registerInbox } from './tools/inbox.mjs';
+import { registerProjects } from './tools/projects.mjs';
 import { registerRecord } from './tools/record.mjs';
 import { registerSignIn } from './tools/sign_in.mjs';
 import { registerStatus } from './tools/status.mjs';
@@ -20,6 +24,10 @@ registerCapture(server);
 registerRecord(server);
 registerWait(server);
 registerSignIn(server);
+registerBrand(server);
+registerInbox(server);
+registerExport(server);
+registerProjects(server);
 
 process.on('uncaughtException', (e) => console.error('[marketing-studio]', e));
 const stop = async () => {

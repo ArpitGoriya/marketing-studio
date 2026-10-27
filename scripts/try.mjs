@@ -16,7 +16,8 @@ const calls = process.argv.slice(2);
 let n = 0;
 for (let i = 0; i < calls.length; i += 2) {
   const tool = calls[i];
-  const args = JSON.parse(calls[i + 1] ?? '{}');
+  const raw = calls[i + 1] ?? '{}';
+  const args = JSON.parse(raw.startsWith('@') ? fs.readFileSync(raw.slice(1), 'utf8') : raw); // @file.json for long arguments
   n++;
   const t0 = Date.now();
   let r = await client.callTool({ name: tool, arguments: args }, undefined, { timeout: 600000 });
