@@ -1,0 +1,46 @@
+{
+  "manifest_version": "0.3",
+  "name": "marketing-studio",
+  "display_name": "Marketing Studio",
+  "version": "0.1.0",
+  "description": "Lets Claude capture your app and website screens (also behind a login) and turn its own designs into posts, carousels and videos.",
+  "long_description": "Claude does the creative work: the idea, the copy, the design and the motion. Marketing Studio is its camera and export button. It takes screenshots and screen recordings of your app and website (a quick low-quality look first, then high quality), also on pages behind a login, tells Claude about voiceovers you supply, and exports Claude's designs as finished image and video files with the real screens in them. Everything runs and is saved on your own laptop.",
+  "author": {
+    "name": "Arpit Goriya"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.mjs"],
+      "env": {
+        "MS_OUTPUT_DIR": "${user_config.output_dir}"
+      }
+    }
+  },
+  "user_config": {
+    "output_dir": {
+      "type": "directory",
+      "title": "Where to save your work",
+      "description": "A \"Marketing Studio\" folder is made inside it, with one folder per project and an Inbox for voiceovers and music you supply.",
+      "required": false,
+      "default": "${DOCUMENTS}"
+    }
+  },
+  "tools": [
+    {
+      "name": "status",
+      "description": "Check that Marketing Studio is ready on this laptop and where work is saved."
+    }
+  ],
+  "keywords": ["marketing", "screenshots", "screen recording", "social media", "carousel", "video", "explainer"],
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}
