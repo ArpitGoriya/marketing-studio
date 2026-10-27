@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "marketing-studio",
   "display_name": "Marketing Studio",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Lets Claude capture your app and website screens (also behind a login) and turn its own designs into posts, carousels and videos.",
   "long_description": "Claude does the creative work: the idea, the copy, the design and the motion. Marketing Studio is its camera and export button. It takes screenshots and screen recordings of your app and website (a quick low-quality look first, then high quality), also on pages behind a login, tells Claude about voiceovers you supply, and exports Claude's designs as finished image and video files with the real screens in them. Everything runs and is saved on your own laptop.",
   "author": {
@@ -50,7 +50,39 @@
   "tools": [
     {
       "name": "status",
-      "description": "Check that Marketing Studio is ready on this laptop and where work is saved."
+      "description": "Is Marketing Studio ready on this laptop: sites and pages, sign-in, brands, recent projects."
+    },
+    {
+      "name": "brand",
+      "description": "The brand to design with: colours, fonts, logos, patterns, sizes, rules and claims never to make."
+    },
+    {
+      "name": "capture",
+      "description": "A screenshot of a page (phone or desktop, also behind the login): preview first, then high quality."
+    },
+    {
+      "name": "record",
+      "description": "A smooth screen recording of a page from steps (scroll, tap, type, move a slider)."
+    },
+    {
+      "name": "inbox",
+      "description": "The folder for voiceovers, music and images people supply; audio length and spoken parts."
+    },
+    {
+      "name": "export",
+      "description": "Turn Claude's own HTML design into finished PNG slides or an MP4 video with the real screens and sound."
+    },
+    {
+      "name": "projects",
+      "description": "Earlier work: what was captured and exported, and the design to revise."
+    },
+    {
+      "name": "sign_in",
+      "description": "Check or redo the sign-in for pages behind the login."
+    },
+    {
+      "name": "wait",
+      "description": "Get the result of a long job (a recording or a video export)."
     }
   ],
   "keywords": [

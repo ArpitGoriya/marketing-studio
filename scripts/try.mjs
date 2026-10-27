@@ -10,7 +10,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'build', 'try');
 fs.mkdirSync(OUT, { recursive: true });
 const client = new Client({ name: 'try', version: '0' });
-await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(ROOT, 'server', 'index.mjs')], env: { ...process.env }, stderr: 'inherit' }));
+await client.connect(new StdioClientTransport({ command: process.execPath, args: [process.env.MS_SERVER || path.join(ROOT, 'server', 'index.mjs')], env: { ...process.env }, stderr: 'inherit' }));
 
 const calls = process.argv.slice(2);
 let n = 0;
