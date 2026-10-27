@@ -5,7 +5,7 @@
 //                            videos, in step with the page's clock (in images it shows its first frame)
 //   brand:<logo or pattern>  a brand file (e.g. brand:wordmark, brand:wordmark?color=red, brand:mandala)
 //   inbox:<file>             an image someone put in the Inbox
-// The brand's fonts are loaded for every page, so `font-family: 'Playfair Display'` just works. Pages are served on a
+// The brand's fonts are loaded for every page, so `font-family: Inter` (or any brand font by name) just works. Pages are served on a
 // private secure origin (https://studio.local) and can't load anything from the internet.
 // Video: the page's clock (Date, timers, requestAnimationFrame, performance.now) and every CSS/WAAPI animation are
 // stepped together frame by frame from 0, so the result is exact however slow the laptop is.

@@ -30,6 +30,11 @@ Claude will:
 4. change anything you ask ("shorter headline on slide 2", "use the green outfit instead");
 5. save the final files and open the folder.
 
+## Showing Claude a page
+
+Name it in plain words (*the mehndi booking tracker*, *my vendor analytics*) and Claude finds it on the site by
+itself, new pages included. Or copy the link from your browser's address bar and paste it into the chat.
+
 ## A voiceover or music
 
 Chat can't take audio files, so when Claude asks, it opens an **Inbox** folder. Drop your file there (MP3, M4A or

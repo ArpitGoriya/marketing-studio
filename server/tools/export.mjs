@@ -128,7 +128,7 @@ export function registerExport(server) {
       title: 'Export a design',
       description:
         'Turn your own design into finished files. kind "images": `pages` is one HTML page per slide (any size, e.g. size "instagram-portrait" = 1080x1350); each becomes a PNG. kind "video": `html` is one page whose CSS animations (and JS using ms.time()) run from 0 to `duration` seconds; export a "preview" first (fast, half size), then "final". ' +
-        'In your HTML use capture:<name> for screenshots, <img src="clip:<name>" data-start="<seconds>"> for recordings (they play in step with the video), brand:<logo or pattern> (e.g. brand:wordmark?color=red) and inbox:<file> for supplied images. The brand fonts are loaded already (font-family: \'Playfair Display\'). Nothing loads from the internet. ' +
+        'In your HTML use capture:<name> for screenshots, <img src="clip:<name>" data-start="<seconds>"> for recordings (they play in step with the video), brand:<logo or pattern> (e.g. brand:wordmark?color=red) and inbox:<file> for supplied images. The brand fonts are loaded already (use them by name, e.g. font-family: Inter). Nothing loads from the internet. ' +
         'Add a voiceover and/or music from the Inbox to a video with voiceover/music; the mix is levelled to -14 LUFS and music dips under the voice.',
       inputSchema: {
         project: z.string().describe('The same project name used for the captures.'),

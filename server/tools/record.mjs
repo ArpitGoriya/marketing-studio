@@ -10,7 +10,7 @@ import { keepSession } from '../engine/login.mjs';
 import { freeName, openProject } from '../engine/project.mjs';
 import { Recorder } from '../engine/recorder.mjs';
 import { REDACT } from '../engine/redact.mjs';
-import { assertNoWrites, CaptureStop, getSite, inMaintenance, openPage, pageUrl, siteContext, trafficLine } from '../engine/site.mjs';
+import { assertNoWrites, CaptureStop, inMaintenance, openPage, resolvePage, siteContext, trafficLine } from '../engine/site.mjs';
 import { runLive, runRecorded } from '../engine/steps.mjs';
 import { withStudio } from '../engine/studio.mjs';
 import { common, fail, step, text } from './common.mjs';
@@ -20,8 +20,8 @@ const FPS = { preview: 12, high: 60 };
 async function doRecord(a, update) {
   let context;
   try {
-    const site = getSite(a.site);
-    const url = pageUrl(site, a.page);
+    const { site, url } = resolvePage(a.site, a.page);
+    if (a.logged_in && site.adhoc) throw new CaptureStop(`${site.name} isn't set up in Marketing Studio, so only its public pages can be recorded.`);
     const device = a.device ?? 'phone';
     const quality = a.quality ?? 'preview';
     const fps = a.fps ?? FPS[quality];
@@ -114,7 +114,7 @@ export function registerRecord(server) {
     {
       title: 'Record the screen',
       description:
-        'Record a page of the site as a smooth video, on a phone (default) or desktop, from steps you write: scroll, tap, type into a field, wait. Each step takes time in the video (e.g. {"scroll": "bottom", "seconds": 3}, {"fill": {"field": "Product price", "value": "5000", "seconds": 1.5}}, {"wait": 1}). ' +
+        'Record a page (a page name, a path, or any link the person pasted) as a smooth video, on a phone (default) or desktop, from steps you write: scroll, tap, type into a field, wait. Each step takes time in the video (e.g. {"scroll": "bottom", "seconds": 3}, {"fill": {"field": "Product price", "value": "5000", "seconds": 1.5}}, {"wait": 1}). ' +
         'Start with quality "preview" (a quick look: 12 moments in one picture, plus a small video), then "high" for the final (60 frames a second). Returns clip:<name> for videos, and when each tap happened. Nothing on the site is ever changed.',
       inputSchema: {
         ...common,

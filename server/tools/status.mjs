@@ -40,7 +40,7 @@ export function registerStatus(server) {
         const st = sessionStatus(s);
         lines.push(
           `Site "${s.name ?? s.id}" (${s.url})${s.about ? `: ${s.about}` : ''}`,
-          `  Pages: ${Object.entries(s.pages ?? {}).map(([k, v]) => `${k} (${v})`).join(', ') || 'any page by its path'}`,
+          `  Named pages: ${Object.entries(s.pages ?? {}).map(([k, v]) => `${k} (${v})`).join(', ') || 'none'}. Any other page: find_page, or a link the person pastes.`,
           `  Logged-in pages: ${!st.possible ? 'not set up' : st.signedIn ? `signed in (${st.how})` : `not signed in yet; sign-in is ${st.how}`}`,
         );
       }

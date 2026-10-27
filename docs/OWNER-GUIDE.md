@@ -3,13 +3,15 @@
 ## What it is
 
 A Claude desktop extension (MCPB) that runs on each laptop. Claude designs the posts and videos itself; the
-extension gives it nine tools:
+extension gives it eleven tools:
 
 | Tool | What it does |
 |---|---|
 | `status` | What's ready: sites and pages, sign-in, brands, projects. |
 | `brand` | The brand guide, plus a picture of the logos and colours. |
-| `capture` | Screenshots, preview first, then high quality. |
+| `find_page` | Searches the site's live sitemap (and, when signed in, the account menu) once a day, so new pages are found without a new version. |
+| `read_page` | A page as text (headings, buttons, fields), so Claude plans shots without exploring by screenshots. |
+| `capture` | Screenshots, preview first, then high quality; several shots of one page per call. A crop by text grows to the card around it, with fixed bars hidden. |
 | `record` | Frame-by-frame screen recordings. |
 | `inbox` | Supplied audio and images. |
 | `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed. |

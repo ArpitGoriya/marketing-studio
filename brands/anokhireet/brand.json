@@ -74,22 +74,14 @@
   },
   "fonts": [
     {
-      "family": "Playfair Display",
-      "files": [
-        "fonts/PlayfairDisplay-Variable.ttf",
-        "fonts/PlayfairDisplay-Italic-Variable.ttf"
-      ],
-      "weights": "400-900",
-      "use": "headlines (italic for one emphasised word)"
-    },
-    {
       "family": "Inter",
       "files": [
         "fonts/Inter-Variable.ttf",
         "fonts/Inter-Italic-Variable.ttf"
       ],
       "weights": "100-900",
-      "use": "body, labels, captions, buttons"
+      "primary": true,
+      "use": "the brand font, for everything: headlines in SemiBold or Bold (600-700), body and captions in Regular (400), labels and buttons in Medium or SemiBold"
     },
     {
       "family": "Arya",
@@ -97,7 +89,7 @@
         "fonts/Arya-Regular.ttf"
       ],
       "weights": "400",
-      "use": "Hindi (Devanagari) text and the tagline"
+      "use": "only for Hindi (Devanagari) text and the tagline"
     }
   ],
   "logos": {
@@ -187,7 +179,7 @@
   "rules": [
     "Two grounds only: warm cream for most slides and scenes, the maroon gradient for title and brand moments. No other backgrounds, no generic glows or neon gradients.",
     "Colours only from this palette and its gradients. Shadows are soft and maroon-tinted (e.g. 0 20px 60px rgba(74,0,2,0.18)), never hard black.",
-    "Playfair Display for headlines, Inter for everything else, Arya for Hindi. Keep body text at normal letter spacing; big headlines may tighten a little; small uppercase labels may track out.",
+    "Inter is the brand font for everything, headlines included (SemiBold/Bold for headlines, Regular for body). Arya only for Hindi. No other fonts. Keep normal letter spacing (no negative tracking); small uppercase labels may track out a little (0.05-0.08em).",
     "Copy short and balanced: a few words per line, one idea per slide or scene.",
     "App screens appear inside a phone frame (draw a rounded black bezel around the capture), never as floating cut-out screenshots. Small rebuilt pieces (a chip, a card) are fine for close-ups.",
     "Show a detail by zooming into the phone in one smooth move; point at a button with a soft highlight or a fingertip shadow, never a cartoon hand or an outlined circle.",

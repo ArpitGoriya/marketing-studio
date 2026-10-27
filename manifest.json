@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "marketing-studio",
   "display_name": "Marketing Studio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lets Claude capture your app and website screens (also behind a login) and turn its own designs into posts, carousels and videos.",
   "long_description": "Claude does the creative work: the idea, the copy, the design and the motion. Marketing Studio is its camera and export button. It takes screenshots and screen recordings of your app and website (a quick low-quality look first, then high quality), also on pages behind a login, tells Claude about voiceovers you supply, and exports Claude's designs as finished image and video files with the real screens in them. Everything runs and is saved on your own laptop.",
   "author": {
@@ -57,8 +57,16 @@
       "description": "The brand to design with: colours, fonts, logos, patterns, sizes, rules and claims never to make."
     },
     {
+      "name": "find_page",
+      "description": "Find the page someone means in the site's live list of pages (new pages are found by themselves)."
+    },
+    {
+      "name": "read_page",
+      "description": "What is on a page as text (headings, buttons, fields), to plan shots without screenshots."
+    },
+    {
       "name": "capture",
-      "description": "A screenshot of a page (phone or desktop, also behind the login): preview first, then high quality."
+      "description": "Screenshots of a page or pasted link (phone or desktop, also behind the login), several in one go: preview, then high quality."
     },
     {
       "name": "record",

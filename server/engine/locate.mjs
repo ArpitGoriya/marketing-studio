@@ -3,9 +3,10 @@
 // Returns a box in CSS pixels relative to the viewport, or null.
 export const describe = (t) => (typeof t === 'string' ? `"${t}"` : t?.text ? `"${t.text}"` : t?.label ? `the "${t.label}" field` : t?.css ? `"${t.css}"` : 'that');
 
-export const locate = (page, target, { clickable = true } = {}) =>
+// container: grow a text match to the card or panel around it (for crops: "Suggested Rent" means the result card)
+export const locate = (page, target, { clickable = true, container = false } = {}) =>
   page.evaluate(
-    ({ tg, clickable }) => {
+    ({ tg, clickable, container }) => {
       const H = innerHeight;
       const vis = (el) => {
         const r = el.getBoundingClientRect();
@@ -44,12 +45,29 @@ export const locate = (page, target, { clickable = true } = {}) =>
         const on = (r) => (r.bottom > 0 && r.top < H ? 0 : 1);
         return on(ra) - on(rb);
       });
-      const el = cands[0];
+      let el = cands[0];
       if (!el) return null;
+      if (container && !t.css) {
+        // the nearest ancestor that looks like a card: its own background, border or shadow, and not the whole page
+        const looksLikeCard = (e) => {
+          const s = getComputedStyle(e);
+          const bg = s.backgroundColor && !/rgba\(0, 0, 0, 0\)|transparent/.test(s.backgroundColor);
+          return bg || parseFloat(s.borderTopWidth) > 0 || (s.boxShadow && s.boxShadow !== 'none');
+        };
+        const base = el.getBoundingClientRect();
+        for (let a = el.parentElement, i = 0; a && a !== document.body && i < 6; a = a.parentElement, i++) {
+          const r = a.getBoundingClientRect();
+          if (r.height > innerHeight * 0.8 || r.width > innerWidth * 0.999) break;
+          if (looksLikeCard(a) && r.height > base.height * 1.5) {
+            el = a;
+            break;
+          }
+        }
+      }
       const r = el.getBoundingClientRect();
       return { x: r.x, y: r.y, width: r.width, height: r.height, text: (el.innerText || el.getAttribute('aria-label') || el.getAttribute('placeholder') || '').trim().slice(0, 80) };
     },
-    { tg: target, clickable },
+    { tg: target, clickable, container },
   );
 
 // the text an element would be pressed by, checked against the site's "never press" list

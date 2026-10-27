@@ -39,17 +39,48 @@ export function getSite(id) {
   return s;
 }
 
+// a link as people paste it ("anokhireet.in/free-tools", "www.x.com/a?b", "<https://…>", "//x.com/a") -> a full URL, or null
+export function asLink(text) {
+  let t = String(text ?? '').trim().replace(/^<|>$/g, '').replace(/[)\].,;]+$/, '');
+  if (/^\/\//.test(t)) t = `https:${t}`;
+  else if (!/^https?:\/\//i.test(t) && /^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(t)) t = `https://${t}`;
+  if (!/^https?:\/\//i.test(t)) return null;
+  try {
+    return new URL(t).href;
+  } catch {
+    return null;
+  }
+}
+
 // "rental price calculator", "/calculators", or a full URL on the site -> a URL
 export function pageUrl(site, page = '/') {
   const p = String(page ?? '/').trim();
   const named = site.pages?.[p.toLowerCase()];
-  const target = named ?? p;
+  const target = named ?? asLink(p) ?? p;
   const base = new URL(site.url);
   const url = new URL(/^https?:\/\//.test(target) ? target : target.startsWith('/') ? target : `/${target}`, base);
-  if (url.host !== base.host && !url.host.endsWith(`.${base.host.replace(/^www\./, '')}`)) {
-    throw new CaptureStop(`${url.host} isn't part of ${site.name ?? site.id} (${base.host}). Only pages of a set-up site can be captured.`);
-  }
+  if (!isSite(site, url.href)) throw new CaptureStop(`${url.host} isn't part of ${site.name ?? site.id} (${base.host}).`);
   return url.href;
+}
+
+// which site and URL a page means: a set-up site's named page or path, or a pasted link. A link to a site that isn't
+// set up still works for public pages (same safety, no sign-in, no start state).
+export function resolvePage(siteId, page) {
+  const link = asLink(page);
+  if (link) {
+    const known = sites().find((s) => isSite(s, link));
+    if (known) {
+      // www.<site> and <site> are the same site: use the site's own address (anokhireet.in's www certificate lapsed)
+      const u = new URL(link);
+      const base = new URL(known.url);
+      if (u.host.replace(/^www\./, '') === base.host.replace(/^www\./, '')) u.host = base.host;
+      return { site: known, url: u.href };
+    }
+    const u = new URL(link);
+    return { site: { id: u.host.replace(/[^a-z0-9.-]/gi, '_'), name: u.host, url: u.origin, adhoc: true }, url: link };
+  }
+  const site = getSite(siteId);
+  return { site, url: pageUrl(site, page) };
 }
 
 const isSite = (site, url) => {
