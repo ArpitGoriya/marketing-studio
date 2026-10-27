@@ -14,9 +14,13 @@
     "entry_point": "server/index.mjs",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server/index.mjs"],
+      "args": [
+        "${__dirname}/server/index.mjs"
+      ],
       "env": {
-        "MS_OUTPUT_DIR": "${user_config.output_dir}"
+        "MS_OUTPUT_DIR": "${user_config.output_dir}",
+        "MS_DEMO_PHONE": "${user_config.demo_phone}",
+        "MS_DEMO_CODE": "${user_config.demo_code}"
       }
     }
   },
@@ -27,6 +31,20 @@
       "description": "A \"Marketing Studio\" folder is made inside it, with one folder per project and an Inbox for voiceovers and music you supply.",
       "required": false,
       "default": "${DOCUMENTS}"
+    },
+    "demo_phone": {
+      "type": "string",
+      "title": "Demo account phone number",
+      "description": "The Anokhi Reet test account used for pages behind the login (a Supabase test number, so no SMS is sent).",
+      "required": false,
+      "default": "7265959336"
+    },
+    "demo_code": {
+      "type": "string",
+      "title": "Demo account code",
+      "description": "The test account's fixed code (ask the owner). Kept securely on this laptop.",
+      "required": false,
+      "sensitive": true
     }
   },
   "tools": [
@@ -35,10 +53,21 @@
       "description": "Check that Marketing Studio is ready on this laptop and where work is saved."
     }
   ],
-  "keywords": ["marketing", "screenshots", "screen recording", "social media", "carousel", "video", "explainer"],
+  "keywords": [
+    "marketing",
+    "screenshots",
+    "screen recording",
+    "social media",
+    "carousel",
+    "video",
+    "explainer"
+  ],
   "compatibility": {
     "claude_desktop": ">=0.10.0",
-    "platforms": ["darwin", "win32"],
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
     "runtimes": {
       "node": ">=20.0.0"
     }

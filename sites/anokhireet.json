@@ -29,15 +29,42 @@
     "supabase\\.co/auth/v1/token",
     "supabase\\.co/rest/v1/rpc/get_"
   ],
-  "never_press": ["delete", "remove", "pay", "buy", "rent now", "book", "checkout", "contact", "call", "whatsapp", "send", "submit", "enquire", "enquiry", "inquiry", "report", "log out", "logout", "sign out", "deactivate", "subscribe", "upgrade"],
+  "never_press": [
+    "delete",
+    "remove",
+    "pay",
+    "buy",
+    "rent now",
+    "book",
+    "checkout",
+    "contact",
+    "call",
+    "whatsapp",
+    "send",
+    "submit",
+    "enquire",
+    "enquiry",
+    "inquiry",
+    "report",
+    "log out",
+    "logout",
+    "sign out",
+    "deactivate",
+    "subscribe",
+    "upgrade"
+  ],
   "login": {
     "type": "supabase-phone",
     "supabase_url": "https://xtmatyafdmqchkwwbtfa.supabase.co",
-    "anon_key": "",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0bWF0eWFmZG1xY2hrd3didGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNDUxODksImV4cCI6MjA4MjkyMTE4OX0.V_kaGySdJUcqEqemQqSHnkHz0vqLcExNnIL9Llsd2fc",
     "storage_key": "anokhi_reet_auth_token",
     "phone_setting": "demo_phone",
     "code_setting": "demo_code",
-    "note": "A demo customer account whose number is a Supabase test phone number with a fixed code, so no SMS is sent and no one needs an OTP."
+    "note": "A demo customer account whose number is a Supabase test phone number with a fixed code, so no SMS is sent and no one needs an OTP.",
+    "country_code": "+91",
+    "logged_out_when": {
+      "text": "SEND OTP VIA WHATSAPP"
+    }
   },
   "redact_when_logged_in": true
 }

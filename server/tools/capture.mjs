@@ -43,7 +43,7 @@ export function registerCapture(server) {
         context = made.context;
         const scale = made.dev.scale[quality];
         if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
-        const page = await openPage(context, site, url, { warm: !!a.full_page });
+        const page = await openPage(context, site, url, { warm: !!a.full_page, loggedIn: !!a.logged_in });
         await runLive(page, site, a.steps ?? [], { touch: device === 'phone' });
 
         const scrollY = a.full_page ? 0 : await page.evaluate(() => scrollY);

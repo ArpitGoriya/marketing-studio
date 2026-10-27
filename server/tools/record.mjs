@@ -30,7 +30,7 @@ async function doRecord(a, update) {
     context = made.context;
     if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
     update(0.02, 'opening the page');
-    const page = await openPage(context, site, url, { clock: true, warm: true });
+    const page = await openPage(context, site, url, { clock: true, warm: true, loggedIn: !!a.logged_in });
     await runLive(page, site, a.setup ?? [], { touch: device === 'phone' });
 
     const p = openProject(a.project);

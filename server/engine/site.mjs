@@ -175,7 +175,7 @@ export async function preScroll(page) {
 }
 
 // open a page ready to capture: loaded, settled, images in, not in maintenance, not bounced to a login page
-export async function openPage(context, site, url, { clock = false, warm = false } = {}) {
+export async function openPage(context, site, url, { clock = false, warm = false, loggedIn = false } = {}) {
   const page = await context.newPage();
   if (clock) await page.clock.install();
   const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch((e) => {
@@ -184,6 +184,10 @@ export async function openPage(context, site, url, { clock = false, warm = false
   if (res && res.status() >= 400) throw new CaptureStop(`${url} answered with an error (${res.status()}).`);
   await settle(page);
   if (inMaintenance(site, page)) throw new CaptureStop(`${site.name ?? site.id} is in maintenance mode right now (it shows ${site.maintenance_path}), so nothing was captured.`);
+  const out = site.login?.logged_out_when;
+  if (loggedIn && out?.text && (await page.getByText(out.text, { exact: false }).first().isVisible().catch(() => false))) {
+    throw new CaptureStop(`The page asked to sign in, so the demo account isn't signed in on this laptop. Check the demo account code in the extension's settings, or use sign_in with action "now".`);
+  }
   if (warm) await preScroll(page);
   await waitImages(page);
   return page;

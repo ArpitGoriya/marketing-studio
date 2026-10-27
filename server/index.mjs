@@ -10,6 +10,7 @@ import { INSTRUCTIONS } from './instructions.mjs';
 import { VERSION } from './paths.mjs';
 import { registerCapture } from './tools/capture.mjs';
 import { registerRecord } from './tools/record.mjs';
+import { registerSignIn } from './tools/sign_in.mjs';
 import { registerStatus } from './tools/status.mjs';
 import { registerWait } from './tools/wait.mjs';
 
@@ -18,6 +19,7 @@ registerStatus(server);
 registerCapture(server);
 registerRecord(server);
 registerWait(server);
+registerSignIn(server);
 
 process.on('uncaughtException', (e) => console.error('[marketing-studio]', e));
 const stop = async () => {
