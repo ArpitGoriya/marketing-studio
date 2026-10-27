@@ -28,7 +28,12 @@ export function registerFindPage(server) {
         const named = Object.entries(site.pages ?? {}).map(([k, v]) => ({ url: new URL(v, site.url).href, group: 'named', text: k }));
         const pub = await publicPages(site, { refresh });
         const acct = logged_in || sessionStatus(site).signedIn ? await accountPages(site, { refresh }) : [];
-        const all = [...named, ...acct, ...pub];
+        // one entry per page: /user/wishlist and /user/wishlist/ are the same (named pages win)
+        const seen = new Set();
+        const all = [...named, ...acct, ...pub].filter((p) => {
+          const k = p.url.replace(/\/+(?=$|[?#])/, '');
+          return !seen.has(k) && seen.add(k);
+        });
         if (!search) {
           const groups = {};
           for (const p of pub) groups[p.group] = (groups[p.group] ?? 0) + 1;

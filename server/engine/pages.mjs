@@ -49,7 +49,7 @@ export async function accountPages(site, { refresh = false } = {}) {
       const links = await page.evaluate((origin) => {
         const seen = new Set();
         return [...document.querySelectorAll('a[href]')]
-          .map((a) => ({ url: new URL(a.getAttribute('href'), location.href).href, text: (a.innerText || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim() }))
+          .map((a) => ({ url: new URL(a.getAttribute('href'), location.href).href, text: [a.innerText, a.getAttribute('aria-label'), a.getAttribute('title')].map((t) => (t || '').replace(/\s+/g, ' ').trim()).find((t) => /[a-z]{2}/i.test(t)) || (new URL(a.href).pathname.split('/').filter(Boolean).pop() || '').replace(/-/g, ' ') }))
           .filter((l) => l.url.startsWith(origin) && l.text && !seen.has(l.url) && seen.add(l.url));
       }, new URL(site.url).origin);
       for (const l of links) if (/\/user\b|\/my-|\/vendor|\/shop\/|\/settings|\/wishlist/.test(l.url)) out.push({ url: l.url, group: 'logged in', text: l.text });
@@ -57,7 +57,8 @@ export async function accountPages(site, { refresh = false } = {}) {
     }
     if (out.length) writeJson(f, out);
     return out;
-  } catch {
+  } catch (e) {
+    console.error(`[marketing-studio] account pages: ${e.message}`);
     return readJson(f, []); // not signed in, or the site is down: the last list we had
   } finally {
     await context?.close().catch(() => {});
