@@ -5,13 +5,26 @@
 // stdout carries the MCP protocol, so anything else must go to stderr.
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { closeBrowser } from './engine/browser.mjs';
 import { INSTRUCTIONS } from './instructions.mjs';
 import { VERSION } from './paths.mjs';
+import { registerCapture } from './tools/capture.mjs';
+import { registerRecord } from './tools/record.mjs';
 import { registerStatus } from './tools/status.mjs';
+import { registerWait } from './tools/wait.mjs';
 
 const server = new McpServer({ name: 'marketing-studio', title: 'Marketing Studio', version: VERSION }, { instructions: INSTRUCTIONS });
 registerStatus(server);
+registerCapture(server);
+registerRecord(server);
+registerWait(server);
 
 process.on('uncaughtException', (e) => console.error('[marketing-studio]', e));
+const stop = async () => {
+  await closeBrowser();
+  process.exit(0);
+};
+process.stdin.on('end', stop);
+process.on('SIGTERM', stop);
 await server.connect(new StdioServerTransport());
 console.error(`[marketing-studio] ${VERSION} ready`);

@@ -1,0 +1,43 @@
+{
+  "name": "Anokhi Reet",
+  "url": "https://anokhireet.in",
+  "brand": "anokhireet",
+  "about": "An ethnic-wear rental and shopping app: outfits, shops and vendors by city. Free tools: /calculators (rental price, rent vs buy).",
+  "pages": {
+    "home": "/",
+    "categories": "/categories",
+    "products": "/products",
+    "shops": "/shops",
+    "vendors": "/vendors",
+    "calculators": "/calculators",
+    "rental price calculator": "/calculators/rental-price-calculator",
+    "rent vs buy calculator": "/calculators/rent-vs-buy-calculator",
+    "how it works": "/how-it-works",
+    "my calculators (logged in)": "/user/calculators",
+    "my wishlist (logged in)": "/user/wishlist",
+    "my profile (logged in)": "/user/profile"
+  },
+  "start_state": {
+    "localStorage": {
+      "user_city": "ahmedabad",
+      "vendor_approved_popup_seen": "true"
+    }
+  },
+  "device_css": ":root { --safe-top: 59px !important; --safe-bottom: 34px !important; } .snap-x, .snap-mandatory, .snap-y { scroll-snap-type: none !important; } nextjs-portal, [data-nextjs-toast], [data-next-badge-root] { display: none !important; }",
+  "maintenance_path": "/coming-soon",
+  "allow_writes_to": [
+    "supabase\\.co/auth/v1/token",
+    "supabase\\.co/rest/v1/rpc/get_"
+  ],
+  "never_press": ["delete", "remove", "pay", "buy", "rent now", "book", "checkout", "contact", "call", "whatsapp", "send", "submit", "enquire", "enquiry", "inquiry", "report", "log out", "logout", "sign out", "deactivate", "subscribe", "upgrade"],
+  "login": {
+    "type": "supabase-phone",
+    "supabase_url": "https://xtmatyafdmqchkwwbtfa.supabase.co",
+    "anon_key": "",
+    "storage_key": "anokhi_reet_auth_token",
+    "phone_setting": "demo_phone",
+    "code_setting": "demo_code",
+    "note": "A demo customer account whose number is a Supabase test phone number with a fixed code, so no SMS is sent and no one needs an OTP."
+  },
+  "redact_when_logged_in": true
+}

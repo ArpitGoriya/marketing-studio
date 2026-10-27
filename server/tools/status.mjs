@@ -1,8 +1,17 @@
-// status: is Marketing Studio ready on this laptop, and where does the work go?
+// status: is Marketing Studio ready on this laptop? Where does work go, which sites and pages can it capture, is it
+// signed in, can it make video? The first call starts the browser (downloading one only if the laptop has no
+// Chrome or Edge).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { brands, ensureDirs, OUTPUT, ROOT, sites, VERSION } from '../paths.mjs';
+import { browserKind, getBrowser } from '../engine/browser.mjs';
+import { sessionStatus } from '../engine/login.mjs';
+import { listProjects } from '../engine/project.mjs';
+import { withStudio } from '../engine/studio.mjs';
+import { brands, ensureDirs, INBOX, OUTPUT, ROOT, sites, VERSION } from '../paths.mjs';
+import { text } from './common.mjs';
+
+let videoOk = null;
 
 export function registerStatus(server) {
   server.registerTool(
@@ -10,29 +19,37 @@ export function registerStatus(server) {
     {
       title: 'Marketing Studio status',
       description:
-        'Check that Marketing Studio is ready on this laptop: where work is saved, which sites and brands it knows, and what still needs setting up. Call this first in a session.',
+        'Check that Marketing Studio is ready on this laptop: where work is saved, the sites and pages it can capture (and whether it is signed in), the brands, recent projects. Call this first in a session.',
       inputSchema: {},
       annotations: { readOnlyHint: true },
     },
     async () => {
       ensureDirs();
-      const s = sites();
+      const lines = [`Marketing Studio ${VERSION} (Node ${process.versions.node}, ${os.platform()} ${os.arch()}).`];
+      try {
+        await getBrowser();
+        const k = browserKind();
+        lines.push(`Browser: ready (${k === 'msedge' ? 'Microsoft Edge' : k === 'chrome' ? 'Google Chrome' : 'downloaded Chromium'}).`);
+        if (videoOk === null) videoOk = await withStudio([], (s) => s.canEncode()).catch(() => false);
+        lines.push(videoOk ? 'Video: ready (MP4 made by the browser).' : 'Video: this browser cannot make MP4 video. Install Google Chrome and restart Claude.');
+      } catch (e) {
+        lines.push(`Browser: not ready (${e.message}).`);
+      }
+      lines.push(`Work is saved in: ${OUTPUT}`, `Voiceovers, music and images people supply go in the Inbox: ${INBOX}`);
+      for (const s of sites()) {
+        const st = sessionStatus(s);
+        lines.push(
+          `Site "${s.name ?? s.id}" (${s.url})${s.about ? `: ${s.about}` : ''}`,
+          `  Pages: ${Object.entries(s.pages ?? {}).map(([k, v]) => `${k} (${v})`).join(', ') || 'any page by its path'}`,
+          `  Logged-in pages: ${!st.possible ? 'not set up' : st.signedIn ? `signed in (${st.how})` : `not signed in yet; sign-in is ${st.how}`}`,
+        );
+      }
       const b = brands();
-      const lines = [
-        `Marketing Studio ${VERSION} is running (Node ${process.versions.node}, ${os.platform()} ${os.arch()}).`,
-        `Work is saved in: ${OUTPUT}`,
-        `Supplied files (voiceovers, music, images) go in: ${path.join(OUTPUT, 'Inbox')}`,
-        `Sites it can capture: ${s.length ? s.map((x) => `${x.name ?? x.id} (${x.url})`).join(', ') : 'none set up yet'}.`,
-        `Brands: ${b.length ? b.map((x) => x.name ?? x.id).join(', ') : 'none set up yet'}.`,
-        'Not built yet: capturing screens, recordings and exporting (coming in the next phases).',
-      ];
+      lines.push(`Brands: ${b.length ? b.map((x) => x.name ?? x.id).join(', ') : 'none set up yet'} (details: the brand tool).`);
+      const ps = listProjects().slice(0, 6);
+      if (ps.length) lines.push(`Recent projects: ${ps.map((p) => `"${p.title}"`).join(', ')}.`);
       const hello = fs.readFileSync(path.join(ROOT, 'assets', 'hello.png')).toString('base64');
-      return {
-        content: [
-          { type: 'text', text: lines.join('\n') },
-          { type: 'image', data: hello, mimeType: 'image/png' },
-        ],
-      };
+      return { content: [text(lines.join('\n')), { type: 'image', data: hello, mimeType: 'image/png' }] };
     },
   );
 }
