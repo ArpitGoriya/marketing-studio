@@ -51,6 +51,7 @@ const PARTS = {
   bass: { steps: 1, pattern: 'D2 - - - | Bb1 - - -' },
   pad: { steps: 1, pattern: 'D3+A3+F4 - - -' },
   pluck: { steps: 4, pattern: 'D5 A4 F5 A4' },
+  keys: { steps: 1, pattern: 'D4+F#4+A4 - - - | A3+C#4+E4 - - -' },
   kick: { steps: 1, pattern: 'x x x x' },
   hat: { pattern: 'x x x o' },
   boom: { at: [0.2, 4] },

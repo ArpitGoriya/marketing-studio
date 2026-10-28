@@ -45,7 +45,7 @@ async function doRecord(a, update) {
     });
     const planned = Math.max(1, estimateSeconds(a.steps ?? []) * fps);
     rec.onFrame = (n) => n % 10 === 0 && update(0.05 + 0.75 * Math.min(1, n / planned), `recording frame ${n}`);
-    await runRecorded(rec, site, a.steps ?? [], { touch: device === 'phone' });
+    await runRecorded(rec, site, a.steps ?? [], { touch: device === 'phone', showTaps: a.show_taps ?? true });
     if (!rec.n) throw new CaptureStop('Nothing was recorded: add steps like {"wait": 2} or {"scroll": "bottom", "seconds": 3}.');
     assertNoWrites(made.traffic);
     if (a.logged_in) await keepSession(page, site);
@@ -75,7 +75,7 @@ async function doRecord(a, update) {
       setup: a.setup ?? [],
       steps: a.steps ?? [],
       [quality]: { frames: path.relative(p.dir, dir), count: rec.n, fps, seconds: +(rec.n / fps).toFixed(2), width: stats.width, height: stats.height, mp4: path.relative(p.dir, mp4) },
-      taps: rec.taps.map((t) => ({ label: t.label, at: +t.at.toFixed(2) })),
+      taps: rec.taps.map((t) => ({ label: t.label, at: +t.at.toFixed(2), x: Math.round(t.x), y: Math.round(t.y) })),
       marks: rec.marks.map((m) => ({ label: m.label, at: +m.at.toFixed(2) })),
       at: new Date().toISOString(),
     };
@@ -83,7 +83,7 @@ async function doRecord(a, update) {
     const lines = [
       `${quality === 'high' ? 'High-quality' : 'Preview'} recording "${name}": ${(rec.n / fps).toFixed(1)} s at ${fps} fps, ${stats.width}x${stats.height}, of ${url} (${device}${a.logged_in ? ', logged in' : ''}).`,
       `Use it in videos as clip:${name}${quality === 'preview' ? ' (record it again with quality "high" before the final export)' : ''}.`,
-      ...(rec.taps.length ? [`Taps: ${rec.taps.map((t) => `"${t.label}" at ${t.at.toFixed(2)} s`).join(', ')}`] : []),
+      ...(rec.taps.length ? [`Taps (shown in the recording as a fingertip${a.show_taps === false ? ': off' : ''}; x, y on the ${vp.width}x${vp.height} screen): ${rec.taps.map((t) => `"${t.label}" at ${t.at.toFixed(2)} s (${Math.round(t.x)}, ${Math.round(t.y)})`).join(', ')}`] : []),
       ...(rec.marks.length ? [`Marks: ${rec.marks.map((m) => `${m.label} at ${m.at.toFixed(2)} s`).join(', ')}`] : []),
       trafficLine(made.traffic),
       `Saved: ${mp4}`,
@@ -116,13 +116,15 @@ export function registerRecord(server) {
       title: 'Record the screen',
       description:
         'Record a page (a page name, a path, or any link the person pasted) as a smooth video, on a phone (default) or desktop, from steps you write: scroll, tap, type into a field, wait. Each step takes time in the video (e.g. {"scroll": "bottom", "seconds": 3}, {"fill": {"field": "Product price", "value": "5000", "seconds": 1.5}}, {"wait": 1}). ' +
-        'Start with quality "preview" (a quick look: 12 moments in one picture, plus a small video), then "high" for the final (60 frames a second). Returns clip:<name> for videos, and when each tap happened. Nothing on the site is ever changed.',
+        'This is how a video shows the real flow: record the whole action as the user does it (open, tap, type, see the result) in one recording, rather than stitching still screens. Taps are filmed as a soft fingertip. ' +
+        'Start with quality "preview" (a quick look: 12 moments in one picture, plus a small video), then "high" for the final (60 frames a second). Returns clip:<name> for videos, and when and where each tap happened. Nothing on the site is ever changed.',
       inputSchema: {
         ...common,
         setup: z.array(step).optional().describe('Done before recording starts, not filmed (e.g. scroll to the calculator first).'),
         steps: z.array(step).describe('What happens in the recording, in order. Each step takes time.'),
         fps: z.number().int().min(10).max(60).optional().describe('Frames per second (preview 12, high 60).'),
         redact: z.boolean().optional().describe('Hide phone numbers and email addresses (on by default for logged-in pages).'),
+        show_taps: z.boolean().optional().describe('Film a soft fingertip where each tap lands (default true).'),
       },
     },
     async (a) => {

@@ -124,9 +124,26 @@ if (kind === 'images') {
     await view.waitForFunction(() => /%/.test(document.querySelector('#meta').textContent), null, { timeout: 60000 });
     await page.screenshot({ path: path.join(OUT, '0-waiting.png') });
     console.log(`while it works: "${await view.locator('#title').textContent()}", ${await view.locator('#meta').textContent()}, "${await status()}"`);
+    // Snake while it waits: start, steer, crash into the wall, play again
+    const game = () => view.evaluate(() => JSON.stringify(window.msSnake.info()));
+    await view.locator('#play').click();
+    console.log(`Snake started: ${await game()}`);
+    await page.keyboard.press('ArrowUp');
+    await page.waitForTimeout(400);
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: path.join(OUT, '0-snake.png') });
+    console.log(`after Up, Right: ${await game()}`);
+    await view.waitForFunction(() => window.msSnake.info()?.state === 'over', null, { timeout: 20000 }).catch(() => {});
+    await page.screenshot({ path: path.join(OUT, '0-snake-over.png') });
+    console.log(`into the wall: ${await game()}`);
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(300);
+    console.log(`Space: ${await game()}`);
   }
   await view.waitForFunction(() => document.querySelector('video')?.readyState >= 1, null, { timeout: 300000, polling: 1000 });
   console.log(`video: ${await view.evaluate(() => { const v = document.querySelector('video'); return `${v.videoWidth}x${v.videoHeight}, ${v.duration.toFixed(1)} s`; })}; header "${await view.locator('#meta').textContent()}"`);
+  console.log(`Snake when the video came: ${await view.evaluate(() => JSON.stringify(window.msSnake.info()))}, game on: ${await view.evaluate(() => window.msSnake.on())}; status "${await status()}"`);
   await view.evaluate(() => { const v = document.querySelector('video'); v.currentTime = 4; });
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, '1-video.png') });

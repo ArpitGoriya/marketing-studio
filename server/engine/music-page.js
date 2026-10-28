@@ -43,7 +43,15 @@
     comp.ratio.value = 2.5;
     comp.attack.value = 0.01;
     comp.release.value = 0.25;
-    master.connect(comp).connect(ctx.destination);
+    // the tone: warm rounds off the highs (soft background, nothing shrill), clear a little less, bright not at all
+    const cut = { warm: 4200, clear: 8000 }[plan.tone ?? 'warm'];
+    if (cut) {
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = cut;
+      lp.Q.value = 0.5;
+      master.connect(lp).connect(comp).connect(ctx.destination);
+    } else master.connect(comp).connect(ctx.destination);
     const verb = ctx.createConvolver();
     verb.buffer = impulse(ctx);
     const verbOut = ctx.createGain();
@@ -170,6 +178,29 @@
         const o = osc('sawtooth', t, hz(e.m), lp);
         o.start(t);
         o.stop(t + 0.9);
+      } else if (p.play === 'keys') {
+        // a soft electric piano: a sine carrier with a gentle FM bell on the attack that fades, plus a quiet octave
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(e.v * 0.55, t + 0.006);
+        g.gain.setTargetAtTime(e.v * 0.2, t + 0.01, 0.8); // dies away while held, like a real piano
+        g.gain.setTargetAtTime(0, t + e.d, 0.12);
+        g.connect(out);
+        const f = hz(e.m);
+        const car = osc('sine', t, f, g);
+        const depth = ctx.createGain();
+        depth.gain.setValueAtTime(f * 1.4, t);
+        depth.gain.setTargetAtTime(f * 0.15, t, 0.25);
+        depth.connect(car.frequency);
+        const mod = osc('sine', t, f, depth);
+        const oct = ctx.createGain();
+        oct.gain.value = 0.12;
+        oct.connect(g);
+        const o2 = osc('sine', t, f * 2, oct);
+        for (const o of [car, mod, o2]) {
+          o.start(t);
+          o.stop(t + e.d + 1.5);
+        }
       } else if (p.play === 'kick') {
         const g = ctx.createGain();
         g.gain.setValueAtTime(e.v * 1.1, t);
@@ -259,7 +290,7 @@
           const shelf = ctx.createBiquadFilter();
           shelf.type = 'highshelf';
           shelf.frequency.value = 2800;
-          shelf.gain.value = 6;
+          shelf.gain.value = 3;
           shelf.connect(out);
           sample(p.play, z.file, e.t, rate, e.v, shelf, { maxLen: 2.6 });
           const n = ctx.createBufferSource();

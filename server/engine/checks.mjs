@@ -20,8 +20,9 @@ export function limits({ width, height, video }) {
   const story = height / width > 1.6;
   return {
     minText: Math.round((video ? 34 : 26) * k),
-    minZoom: +((video ? 1.6 : 1.3) * k).toFixed(2),
-    goodZoom: +((video ? 2.5 : 2) * k).toFixed(1),
+    // only a really small screen is flagged: a phone shown whole, filling most of the frame, is the normal shot
+    minZoom: +((video ? 1.15 : 0.9) * k).toFixed(2),
+    goodZoom: +((video ? 1.5 : 1.3) * k).toFixed(1),
     headline: Math.round(40 * k),
     // the Reels/Stories buttons and caption (brand.safe_zones overrides, at 1080x1920)
     zones: story ? { top: 270, bottom: 350, right: 150, scale: height / 1920 } : null,
@@ -178,7 +179,7 @@ const SAY = {
   small: (f, o) => `small text: ${f.px} px "${f.text}" (aim for ${o.minText} px or more at this size, so it reads on a phone)`,
   zone: (f) => `"${f.text}" sits ${f.where === 'top' ? 'in the top band' : f.where === 'bottom' ? 'in the bottom band' : 'by the right edge'}, under the Reels/Stories ${f.where === 'right' ? 'buttons' : f.where === 'top' ? 'header' : 'caption and buttons'}. Move it towards the middle`,
   words: (f) => `${f.count} words; a slide reads best under about 30`,
-  zoom: (f, o) => `${f.ref} shows at ${f.zoom}x its size on the phone, so its normal text reads like ${f.pt} pt (too small). Show it bigger or zoom into the part that matters (${o.goodZoom}x or more)`,
+  zoom: (f, o) => `${f.ref} shows at ${f.zoom}x its size on the phone, so its text reads like ${f.pt} pt. If people need to read it, show the phone bigger (about ${o.goodZoom}x, filling most of the frame's height) rather than zooming in; zoom only for the one detail that matters`,
   empty: (f) => `${f.what}. Fill it (bigger type or screen, tighter layout) unless it's on purpose`,
 };
 
@@ -228,6 +229,6 @@ function spans(times) {
 export function emptyFinding(b) {
   if (!b) return null;
   if (b.band >= 0.28) return { kind: 'empty', what: `an empty band covers ${Math.round(b.band * 100)}% of the height (from ${Math.round(b.from * 100)}% to ${Math.round(b.to * 100)}% down)` };
-  if (b.left >= 0.18 && b.right >= 0.18) return { kind: 'empty', what: `everything sits in the middle ${Math.round((1 - b.left - b.right) * 100)}% of the width, the sides are empty` };
+  if (b.left >= 0.25 && b.right >= 0.25) return { kind: 'empty', what: `everything sits in the middle ${Math.round((1 - b.left - b.right) * 100)}% of the width, the sides are empty` };
   return null;
 }

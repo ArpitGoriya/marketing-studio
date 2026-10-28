@@ -13,7 +13,7 @@ extension gives it fourteen tools:
 | `find_page` | Searches the site's live sitemap (and, when signed in, the account menu) once a day, so new pages are found without a new version. |
 | `read_page` | A page as text (headings, buttons, fields), so Claude plans shots without exploring by screenshots. |
 | `capture` | Screenshots, preview first, then high quality; several shots of one page per call. A crop by text grows to the card around it, with fixed bars hidden. Phone screens run edge to edge (`notch: true` keeps a real phone's notch and home-bar bands). |
-| `record` | Frame-by-frame screen recordings. |
+| `record` | Frame-by-frame screen recordings of the real flow; taps are filmed as a soft fingertip (`show_taps: false` turns it off) and reported with their time and place. |
 | `inbox` | Supplied audio and images. |
 | `check` | Renders a design privately for Claude (nothing saved or shown) with a layout check: badly wrapping headlines, cut-off or too-small text, screens too small to read, empty bands, text under the Reels buttons. So Claude fixes its own mistakes before the one export the person sees. |
 | `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed, plus an optional post caption. The same layout check runs on it. The result shows in the chat (see below). |
@@ -31,7 +31,8 @@ viewer uses a few tools of its own (`viewer_*`) that Claude doesn't see.
 
 **Music.** When someone asks for music, Claude writes a short score and the extension plays it with a small kit of
 real instruments in `music/kit/` (tanpura, tabla, dholak, santoor, sitar, harp, flute, strings, harmonium, bells…,
-2.3 MB) plus a few synth parts. Every sound is CC0 (public domain), from the same sources as the AR 2.0 film's score;
+2.3 MB) plus synth parts for modern music (soft keys, pad, bass, pluck, kick, hats). A score's `tone` is "warm" by
+default: the highs are rounded off so background music never sounds shrill. Every sound is CC0 (public domain), from the same sources as the AR 2.0 film's score;
 `music/kit/CREDITS.md` lists each one. `scripts/music-kit/build_kit.py` rebuilds the kit from the film's
 `music/samples-src` (it refuses any sound without a CC0 record). A supplied track in the Inbox is used as before; with
 neither, videos are silent.

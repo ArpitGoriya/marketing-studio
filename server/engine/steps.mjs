@@ -119,7 +119,7 @@ async function waitFor(page, cond, ms) {
   throw new CaptureStop(`The page never showed ${cond.text ? `"${cond.text}"` : cond.url}.`);
 }
 
-export async function runRecorded(rec, site, steps = [], { touch }) {
+export async function runRecorded(rec, site, steps = [], { touch, showTaps = true }) {
   const page = rec.page;
   const where = () => new URL(page.url()).pathname;
   for (const s of steps) {
@@ -151,7 +151,7 @@ export async function runRecorded(rec, site, steps = [], { touch }) {
       const box = await find(page, v, where);
       const no = refusePress(site, v, box);
       if (no) throw new CaptureStop(no);
-      await rec.press(box.text || (typeof v === 'string' ? v : JSON.stringify(v)), box, { touch, holdFrames: rec.frames(0.12), afterFrames: rec.frames(s.after ?? 0.5) });
+      await rec.press(box.text || (typeof v === 'string' ? v : JSON.stringify(v)), box, { touch, showTaps, holdFrames: rec.frames(0.12), afterFrames: rec.frames(s.after ?? 0.5) });
     } else if (k === 'set') {
       // a slider or number glides to its new value over `seconds`
       const el = await field(page, v.field, where);

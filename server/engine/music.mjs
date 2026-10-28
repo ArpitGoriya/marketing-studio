@@ -37,6 +37,7 @@ const VOICES = {
   bass: { kind: 'pitched', synth: true, gain: -15, send: 0, range: [26, 62], held: true, about: 'a soft round bass (synth)' },
   pad: { kind: 'pitched', synth: true, gain: -16, send: 0.3, range: [36, 88], held: true, about: 'a warm held pad (synth), chords' },
   pluck: { kind: 'pitched', synth: true, gain: -2.5, send: 0.25, range: [45, 96], about: 'a short modern pluck (synth)' },
+  keys: { kind: 'pitched', synth: true, gain: -13.5, send: 0.25, range: [36, 84], held: true, about: 'a soft electric piano (synth): warm modern chords and simple melodies' },
   kick: { kind: 'drum', synth: true, gain: -4, send: 0, bols: ['x'], about: 'a soft modern kick (synth)' },
   hat: { kind: 'drum', synth: true, gain: -12.5, send: 0.05, bols: ['x', 'o'], about: 'hi-hat (synth): x closed, o open' },
   boom: { kind: 'drum', synth: true, gain: -6.5, send: 0.2, bols: ['x'], about: 'a deep low hit for a big moment (logo, reveal)' },
@@ -86,6 +87,7 @@ export const scoreShape = z.object({
   tempo: z.number().min(50).max(200).describe('Beats per minute.'),
   key: z.string().optional().describe('The key note (Sa) for the tanpura and the tuned drums, e.g. "D" (default), "C#", "Eb".'),
   volume: z.number().min(-20).max(6).optional().describe('The whole music louder or quieter, in dB.'),
+  tone: z.enum(['warm', 'clear', 'bright']).optional().describe('warm (default): soft, rounded highs, best under a voice or as background; clear: a little more sparkle; bright: everything, for a lively piece.'),
   parts: z.array(part).min(1).max(16),
 });
 
@@ -186,9 +188,9 @@ export function planScore(score, { duration }) {
     for (const list of Object.values(k?.bols ?? {})) for (const f of list) files.add(f);
   }
   const lines = [
-    `Music: ${tempo} bpm in ${score.key ?? 'D'} (a beat every ${beat.toFixed(3)} s, a 4-beat bar every ${(beat * 4).toFixed(2)} s), ${duration} s.`,
+    `Music: ${tempo} bpm in ${score.key ?? 'D'}, ${score.tone ?? 'warm'} tone (a beat every ${beat.toFixed(3)} s, a 4-beat bar every ${(beat * 4).toFixed(2)} s), ${duration} s.`,
     `Parts: ${said.join('; ')}.`,
     ...warnings,
   ];
-  return { plan: { tempo, beat, length: duration, tune, volume: score.volume ?? 0, parts, events, kit: { instruments: ins, files: [...files] } }, lines };
+  return { plan: { tempo, beat, length: duration, tune, volume: score.volume ?? 0, tone: score.tone ?? 'warm', parts, events, kit: { instruments: ins, files: [...files] } }, lines };
 }

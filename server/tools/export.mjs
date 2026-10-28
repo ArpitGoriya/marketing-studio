@@ -276,7 +276,7 @@ export function registerExport(server) {
     {
       title: 'Check a design (private)',
       description:
-        'Render a design privately, for you only, before exporting it: small pictures of every slide (or of moments across a video) and a layout check: headlines wrapping badly or leaving one word alone, text running off the edge or cut off, text too small for a phone, app screens shown too small to read (zoom in), big empty bands, and in 9:16 text under the Reels/Stories buttons. Also reads a music score. Nothing is saved or shown to the person. ' +
+        'Render a design privately, for you only, before exporting it: small pictures of every slide (or of moments across a video) and a layout check: headlines wrapping badly or leaving one word alone, text running off the edge or cut off, text too small for a phone, app screens shown too small to read, big empty bands, and in 9:16 text under the Reels/Stories buttons. Also reads a music score. Nothing is saved or shown to the person. ' +
         'Check, fix and check again until it is right, then export once: each export appears in the chat for the person. Same inputs as export. ' +
         REFS,
       inputSchema: { ...designShape, at: z.array(z.number()).optional().describe('video: extra moments (seconds) to look at closely.') },

@@ -24,8 +24,9 @@ Just say what you want, for example:
 - *A single post announcing our new rent-vs-buy calculator, square size.*
 
 Claude will:
-1. ask a few questions and suggest the idea;
-2. look at the app pages and show you quick screenshots;
+1. ask a few questions and suggest the idea, then show you a short **storyboard** (each scene: what's on screen,
+   the real taps, the words). It waits for your yes before the long work starts, and asks whenever it's unsure;
+2. look at the app pages and show you quick screenshots (for videos it records the real taps, in order);
 3. design it, check it privately (text sizes, empty space, screens big enough to read) and show you the result
    **right in the chat**, once: swipe through the slides, or play the video;
 4. change anything you ask ("shorter headline on slide 2", "use the green outfit instead"). Looking at a slide and
@@ -43,6 +44,9 @@ Under each result in the chat:
   full-quality video replaces it in the same place.
 - **Show in folder**: opens the folder with the files (they're already saved on your laptop).
 
+While a video is being made, press **Play Snake while you wait**: arrow keys or WASD (or swipe), P to pause, Space or a
+tap to play again. It stops by itself the moment your video is ready.
+
 Want an earlier piece back? Ask *show me the calculator carousel again*.
 
 ## Showing Claude a page
@@ -52,9 +56,10 @@ itself, new pages included. Or copy the link from your browser's address bar and
 
 ## A voiceover or music
 
-- **Music made for your video:** just ask, e.g. *add some warm Indian music* or *upbeat music with tabla*. Claude
-  writes it to fit the video (real instruments: tabla, santoor, sitar, tanpura, strings…) and you hear it in the
-  preview. Ask for changes like any other ("softer", "more tabla", "no music at the end").
+- **Music made for your video:** just ask, e.g. *calm modern background music*, *warm Indian music* or *modern with
+  a little tabla*. Claude writes it to fit the video (soft keys, pads and bass, or tabla, santoor, sitar, tanpura,
+  strings…) and you hear it in the preview. It's kept soft and in the background unless you ask for something
+  livelier. Ask for changes like any other ("softer", "more tabla", "no music at the end").
 - **Your own voiceover or song:** chat can't take audio files, so when Claude asks, it opens an **Inbox** folder.
   Drop your file there (MP3, M4A or WAV), paste the script into the chat, and say "done". Claude times the video to
   your voice.
