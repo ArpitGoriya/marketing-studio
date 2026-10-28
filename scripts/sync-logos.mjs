@@ -16,11 +16,15 @@ if (!process.argv[2] || !fs.existsSync(PUBLIC)) {
 // brand:<name> -> the website's file, the ground it is drawn for, and when to use it
 const LOGOS = {
   'lockup-maroon': ['Shops-Logo/AnokhiReet_logo_maroon.svg', 'light', 'seal + ANOKHI REET wordmark in maroon, for cream/light grounds'],
-  'lockup-shops': ['Shops-Logo/Anokhireet_shop_logo.svg', 'dark', 'Anokhi Reet SHOPS lockup (beige wordmark, gold SHOPS) for maroon grounds'],
-  'lockup-shops-dark': ['Shops-Logo/Anokhireet_shop_logo_dark.svg', 'light', 'Anokhi Reet SHOPS lockup in maroon, for cream/light grounds'],
-  'lockup-vendors': ['Vendors-Logo/AnokhiReet_vendors_Trasparent_logo.svg', 'dark', 'Anokhi Reet VENDORS lockup (beige wordmark, gold VENDORS) for maroon grounds'],
-  'lockup-vendors-dark': ['Vendors-Logo/AnokhiReet_vendors_Trasparent_logo_dark.svg', 'light', 'Anokhi Reet VENDORS lockup in maroon, for cream/light grounds'],
-  'vendors-tile': ['Vendors-Logo/AnokhiReet_vendors_logo.svg', 'light', 'square maroon tile with the gold VENDORS lockup, for any ground (end cards, profile pictures)'],
+  // the marks the app itself shows (its header tabs and the Pro badge): the ones to use for Shops, Vendors and Pro
+  shops: ['shops.svg', 'light', 'THE Shops logo: SHOPS with the seal ring as the O, in the maroon gradient, as in the app header. On maroon grounds use brand:shops?color=beige (as the app does)'],
+  vendors: ['vendors.svg', 'light', 'THE Vendors logo: VENDORS with the seal ring as the O, in the maroon gradient, as in the app header. On maroon grounds use brand:vendors?color=beige (as the app does)'],
+  'pro-badge': ['badges/pro.svg', 'light', 'THE Vendor Pro badge: red pill with white PRO, as in the app, for any ground'],
+  'lockup-shops': ['Shops-Logo/Anokhireet_shop_logo.svg', 'dark', 'the shop partner-programme lockup (beige ANOKHI REET over gold SHOPS, plain O), for maroon grounds; for the Shops logo itself use brand:shops'],
+  'lockup-shops-dark': ['Shops-Logo/Anokhireet_shop_logo_dark.svg', 'light', 'the shop partner-programme lockup in maroon, for cream/light grounds; for the Shops logo itself use brand:shops'],
+  'lockup-vendors': ['Vendors-Logo/AnokhiReet_vendors_Trasparent_logo.svg', 'dark', 'the vendor partner-programme lockup (beige ANOKHI REET over gold VENDORS, plain O), for maroon grounds; for the Vendors logo itself use brand:vendors'],
+  'lockup-vendors-dark': ['Vendors-Logo/AnokhiReet_vendors_Trasparent_logo_dark.svg', 'light', 'the vendor partner-programme lockup in maroon, for cream/light grounds; for the Vendors logo itself use brand:vendors'],
+  'vendors-tile': ['Vendors-Logo/AnokhiReet_vendors_logo.svg', 'light', 'square maroon tile with the gold partner-programme VENDORS lockup, for any ground (end cards, profile pictures)'],
   'lockup-tools': ['Tools-Logo/Tools_logo_golden.svg', 'dark', 'Anokhi Reet TOOLS lockup (beige wordmark, gold TOOLS with the seal ring as the O) for maroon grounds; the free tools'],
   'lockup-tools-dark': ['Tools-Logo/Tools_logo_maroon.svg', 'light', 'Anokhi Reet TOOLS lockup in maroon, for cream/light grounds; the free tools'],
   'tools-tile': ['Tools-Logo/Tools_logo_with_BG.svg', 'light', 'square maroon tile with the gold TOOLS lockup, for any ground'],
@@ -41,7 +45,9 @@ for (const [name, [rel, ground, use]] of Object.entries(LOGOS)) {
   if (!same) fs.copyFileSync(from, to), changed++;
   // the pack's own earlier drawing of it goes when the official file replaces it
   if (old && path.resolve(old) !== path.resolve(to) && fs.existsSync(old)) fs.rmSync(old), changed++;
-  logos[name] = { file, ground, use, source: `website apps/web/public/${rel}` };
+  // the app draws its header marks beige on maroon: the same recolour here
+  const onDark = /\?color=beige/.test(use) ? { on_dark: '?color=beige' } : {};
+  logos[name] = { file, ground, ...onDark, use, source: `website apps/web/public/${rel}` };
   console.log(`${same ? '  same   ' : '  updated'} brand:${name} <- ${rel}`);
 }
 // keep the order people read in the brand tool: the main marks first, then the families, then badges

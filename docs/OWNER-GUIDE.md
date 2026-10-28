@@ -93,9 +93,11 @@ Everything is made and saved on the laptop, with nothing hosted:
 - **Brand:** `brands/<id>/brand.json`:
   - colours, gradients, fonts (files in `fonts/`), logos (with `ground`), patterns, rules, `never_say` patterns, sizes;
   - the files themselves.
-- **Anokhi Reet's shop, vendor and tools logos** are exact copies of the website's (`apps/web/public/Shops-Logo`,
-  `Vendors-Logo`, `Tools-Logo` in the monorepo). When those change, run
-  `node scripts/sync-logos.mjs "<path to the monorepo>"`: it copies them in and updates `brand.json`.
+- **Anokhi Reet's shop, vendor, Pro and tools logos** are exact copies of the website's files in the monorepo's
+  `apps/web/public`: the app header's `shops.svg` and `vendors.svg` (brand:shops, brand:vendors, the main marks),
+  `badges/pro.svg` (brand:pro-badge), and the partner-programme and tools lockups in `Shops-Logo`, `Vendors-Logo`
+  and `Tools-Logo`. When those change, run `node scripts/sync-logos.mjs "<path to the monorepo>"`: it copies them in
+  and updates `brand.json`.
 - Rebuild, then upload the new version in admin.
 
 ## Develop and test

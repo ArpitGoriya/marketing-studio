@@ -119,34 +119,54 @@
       "use": "seal + ANOKHI REET wordmark in maroon, for cream/light grounds",
       "source": "website apps/web/public/Shops-Logo/AnokhiReet_logo_maroon.svg"
     },
+    "shops": {
+      "file": "logos/shops.svg",
+      "ground": "light",
+      "on_dark": "?color=beige",
+      "use": "THE Shops logo: SHOPS with the seal ring as the O, in the maroon gradient, as in the app header. On maroon grounds use brand:shops?color=beige (as the app does)",
+      "source": "website apps/web/public/shops.svg"
+    },
+    "vendors": {
+      "file": "logos/vendors.svg",
+      "ground": "light",
+      "on_dark": "?color=beige",
+      "use": "THE Vendors logo: VENDORS with the seal ring as the O, in the maroon gradient, as in the app header. On maroon grounds use brand:vendors?color=beige (as the app does)",
+      "source": "website apps/web/public/vendors.svg"
+    },
+    "pro-badge": {
+      "file": "logos/pro.svg",
+      "ground": "light",
+      "use": "THE Vendor Pro badge: red pill with white PRO, as in the app, for any ground",
+      "source": "website apps/web/public/badges/pro.svg"
+    },
     "lockup-shops": {
       "file": "logos/Anokhireet_shop_logo.svg",
       "ground": "dark",
-      "use": "Anokhi Reet SHOPS lockup (beige wordmark, gold SHOPS) for maroon grounds",
+      "use": "the shop partner-programme lockup (beige ANOKHI REET over gold SHOPS, plain O), for maroon grounds; for the Shops logo itself use brand:shops",
       "source": "website apps/web/public/Shops-Logo/Anokhireet_shop_logo.svg"
     },
     "lockup-shops-dark": {
       "file": "logos/Anokhireet_shop_logo_dark.svg",
       "ground": "light",
-      "use": "Anokhi Reet SHOPS lockup in maroon, for cream/light grounds",
+      "use": "the shop partner-programme lockup in maroon, for cream/light grounds; for the Shops logo itself use brand:shops",
       "source": "website apps/web/public/Shops-Logo/Anokhireet_shop_logo_dark.svg"
     },
     "lockup-vendors": {
       "file": "logos/AnokhiReet_vendors_Trasparent_logo.svg",
       "ground": "dark",
-      "use": "Anokhi Reet VENDORS lockup (beige wordmark, gold VENDORS) for maroon grounds",
+      "use": "the vendor partner-programme lockup (beige ANOKHI REET over gold VENDORS, plain O), for maroon grounds; for the Vendors logo itself use brand:vendors",
       "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_Trasparent_logo.svg"
     },
     "lockup-vendors-dark": {
       "file": "logos/AnokhiReet_vendors_Trasparent_logo_dark.svg",
       "ground": "light",
-      "use": "Anokhi Reet VENDORS lockup in maroon, for cream/light grounds",
+      "use": "the vendor partner-programme lockup in maroon, for cream/light grounds; for the Vendors logo itself use brand:vendors",
       "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_Trasparent_logo_dark.svg"
     },
     "vendors-tile": {
       "file": "logos/AnokhiReet_vendors_logo.svg",
       "ground": "light",
-      "use": "square maroon tile with the gold VENDORS lockup, for any ground (end cards, profile pictures)",
+      "use": "square maroon tile with the gold partner-programme VENDORS lockup, for any ground (end cards, profile pictures)",
       "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_logo.svg"
     },
     "lockup-tools": {
@@ -175,11 +195,6 @@
     "google-play": {
       "file": "logos/google-play-badge.svg",
       "use": "official Google Play badge, unaltered",
-      "ground": "light"
-    },
-    "pro-badge": {
-      "file": "logos/badge-pro.svg",
-      "use": "the Vendor Pro badge",
       "ground": "light"
     }
   },

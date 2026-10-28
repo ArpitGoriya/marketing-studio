@@ -14,8 +14,10 @@ const board = (b) => {
   const sw = Object.entries(b.colors ?? {})
     .map(([k, c]) => `<div class="sw"><i style="background:${c.hex}"></i><b>${k}</b><span>${c.hex}</span></div>`)
     .join('');
+  // a logo with an on_dark recolour (e.g. "?color=beige") also gets a tile showing it on maroon
+  const tile = (k, l, q = '', dark = l.ground === 'dark') => `<div class="lg ${dark ? 'dark' : ''}"><img src="brand:${k}${q}"><span>brand:${k}${q}</span></div>`;
   const logos = Object.entries(b.logos ?? {})
-    .map(([k, l]) => `<div class="lg ${l.ground === 'dark' ? 'dark' : ''}"><img src="brand:${k}"><span>brand:${k}</span></div>`)
+    .map(([k, l]) => tile(k, l) + (l.on_dark ? tile(k, l, l.on_dark, true) : ''))
     .join('');
   const fonts = (b.fonts ?? []).map((f) => `<div class="ft" style="font-family:'${f.family}'">${f.family === 'Arya' ? b.tagline?.text ?? 'अनोखी रीत' : `${f.family} Aa 123`}<span>${f.use}</span></div>`).join('');
   return `<style>body{background:#FFF2DF;font-family:Inter;padding:28px;box-sizing:border-box;color:#1A1A1A}h1{font:700 30px Inter;margin:0 0 18px;color:#890304}
@@ -55,8 +57,8 @@ export function registerBrand(server) {
         const cache = path.join(D.tmp, `brand-board-${b.id}-${version}.png`);
         if (!fs.existsSync(cache)) {
           const p = openProject(`_brand-${b.id}`);
-          const { pages } = prepare(p, b, [board(b)], { width: 1100, height: 1060 });
-          const { files } = await exportImages({ project: p, brand: b, pages, width: 1100, height: 1060, outDir: D.tmp });
+          const { pages } = prepare(p, b, [board(b)], { width: 1100, height: 1190 });
+          const { files } = await exportImages({ project: p, brand: b, pages, width: 1100, height: 1190, outDir: D.tmp });
           fs.renameSync(files[0].file, cache);
           fs.rmSync(p.dir, { recursive: true, force: true });
         }
