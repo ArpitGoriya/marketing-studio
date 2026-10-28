@@ -114,29 +114,58 @@
       "use": "the app icon"
     },
     "lockup-maroon": {
-      "file": "logos/lockup-maroon.svg",
+      "file": "logos/AnokhiReet_logo_maroon.svg",
       "ground": "light",
-      "use": "seal + wordmark in maroon, for cream/light grounds"
+      "use": "seal + ANOKHI REET wordmark in maroon, for cream/light grounds",
+      "source": "website apps/web/public/Shops-Logo/AnokhiReet_logo_maroon.svg"
     },
     "lockup-shops": {
-      "file": "logos/lockup-shops.svg",
+      "file": "logos/Anokhireet_shop_logo.svg",
       "ground": "dark",
-      "use": "Anokhi Reet SHOPS lockup (light wordmark, gold SHOPS) for maroon grounds"
+      "use": "Anokhi Reet SHOPS lockup (beige wordmark, gold SHOPS) for maroon grounds",
+      "source": "website apps/web/public/Shops-Logo/Anokhireet_shop_logo.svg"
     },
     "lockup-shops-dark": {
-      "file": "logos/lockup-shops-dark.svg",
+      "file": "logos/Anokhireet_shop_logo_dark.svg",
       "ground": "light",
-      "use": "Anokhi Reet SHOPS lockup in maroon, for cream/light grounds"
+      "use": "Anokhi Reet SHOPS lockup in maroon, for cream/light grounds",
+      "source": "website apps/web/public/Shops-Logo/Anokhireet_shop_logo_dark.svg"
     },
     "lockup-vendors": {
-      "file": "logos/lockup-vendors.svg",
+      "file": "logos/AnokhiReet_vendors_Trasparent_logo.svg",
       "ground": "dark",
-      "use": "Anokhi Reet VENDORS lockup (light wordmark, gold VENDORS) for maroon grounds"
+      "use": "Anokhi Reet VENDORS lockup (beige wordmark, gold VENDORS) for maroon grounds",
+      "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_Trasparent_logo.svg"
     },
     "lockup-vendors-dark": {
-      "file": "logos/lockup-vendors-dark.svg",
+      "file": "logos/AnokhiReet_vendors_Trasparent_logo_dark.svg",
       "ground": "light",
-      "use": "Anokhi Reet VENDORS lockup in maroon, for cream/light grounds"
+      "use": "Anokhi Reet VENDORS lockup in maroon, for cream/light grounds",
+      "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_Trasparent_logo_dark.svg"
+    },
+    "vendors-tile": {
+      "file": "logos/AnokhiReet_vendors_logo.svg",
+      "ground": "light",
+      "use": "square maroon tile with the gold VENDORS lockup, for any ground (end cards, profile pictures)",
+      "source": "website apps/web/public/Vendors-Logo/AnokhiReet_vendors_logo.svg"
+    },
+    "lockup-tools": {
+      "file": "logos/Tools_logo_golden.svg",
+      "ground": "dark",
+      "use": "Anokhi Reet TOOLS lockup (beige wordmark, gold TOOLS with the seal ring as the O) for maroon grounds; the free tools",
+      "source": "website apps/web/public/Tools-Logo/Tools_logo_golden.svg"
+    },
+    "lockup-tools-dark": {
+      "file": "logos/Tools_logo_maroon.svg",
+      "ground": "light",
+      "use": "Anokhi Reet TOOLS lockup in maroon, for cream/light grounds; the free tools",
+      "source": "website apps/web/public/Tools-Logo/Tools_logo_maroon.svg"
+    },
+    "tools-tile": {
+      "file": "logos/Tools_logo_with_BG.svg",
+      "ground": "light",
+      "use": "square maroon tile with the gold TOOLS lockup, for any ground",
+      "source": "website apps/web/public/Tools-Logo/Tools_logo_with_BG.svg"
     },
     "app-store": {
       "file": "logos/app-store-badge.svg",

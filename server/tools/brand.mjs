@@ -55,8 +55,8 @@ export function registerBrand(server) {
         const cache = path.join(D.tmp, `brand-board-${b.id}-${version}.png`);
         if (!fs.existsSync(cache)) {
           const p = openProject(`_brand-${b.id}`);
-          const { pages } = prepare(p, b, [board(b)], { width: 1100, height: 900 });
-          const { files } = await exportImages({ project: p, brand: b, pages, width: 1100, height: 900, outDir: D.tmp });
+          const { pages } = prepare(p, b, [board(b)], { width: 1100, height: 1060 });
+          const { files } = await exportImages({ project: p, brand: b, pages, width: 1100, height: 1060, outDir: D.tmp });
           fs.renameSync(files[0].file, cache);
           fs.rmSync(p.dir, { recursive: true, force: true });
         }

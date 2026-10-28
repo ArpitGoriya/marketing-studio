@@ -2,9 +2,9 @@
   "manifest_version": "0.3",
   "name": "marketing-studio",
   "display_name": "Marketing Studio",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Lets Claude capture your app and website screens (also behind a login) and turn its own designs into posts, carousels and videos.",
-  "long_description": "Claude does the creative work: the idea, the copy, the design and the motion. Marketing Studio is its camera and export button. It takes screenshots and screen recordings of your app and website (a quick low-quality look first, then high quality), also on pages behind a login, tells Claude about voiceovers you supply, and exports Claude's designs as finished image and video files with the real screens in them. Everything runs and is saved on your own laptop.",
+  "long_description": "Claude does the creative work: the idea, the copy, the design, the motion and any music. Marketing Studio is its camera, checker and export button. It takes screenshots and screen recordings of your app and website (a quick low-quality look first, then high quality), also on pages behind a login, checks Claude's designs the way a phone will show them, plays the music Claude writes with real instruments or uses the voiceover and music you supply, and exports finished image and video files with the real screens in them, right in the chat. Everything runs and is saved on your own laptop.",
   "author": {
     "name": "Arpit Goriya"
   },
@@ -53,6 +53,10 @@
       "description": "Is Marketing Studio ready on this laptop: sites and pages, sign-in, brands, recent projects."
     },
     {
+      "name": "guide",
+      "description": "How to make posts, carousels and Reels that work: best practices and how to use these tools for them."
+    },
+    {
       "name": "brand",
       "description": "The brand to design with: colours, fonts, logos, patterns, sizes, rules and claims never to make."
     },
@@ -78,7 +82,11 @@
     },
     {
       "name": "export",
-      "description": "Turn Claude's own HTML design into finished PNG slides or an MP4 video with the real screens and sound."
+      "description": "Turn Claude's own HTML design into finished PNG slides or an MP4 video with the real screens, shown in the chat, with sound (a supplied voiceover or music, or music Claude writes)."
+    },
+    {
+      "name": "check",
+      "description": "Check a design privately before exporting it: pictures and a layout check (text, sizes, empty space, safe zones)."
     },
     {
       "name": "projects",
@@ -86,7 +94,7 @@
     },
     {
       "name": "show",
-      "description": "Shows a finished design in the chat again, with Copy, Download and Show-in-folder buttons."
+      "description": "Shows a finished design in the chat again, with Copy and Show-in-folder buttons."
     },
     {
       "name": "sign_in",

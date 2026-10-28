@@ -1,6 +1,7 @@
 // Try the in-chat viewer without Claude Desktop: exports a small test design, then shows the viewer in a stand-in
-// chat host (a browser page speaking the MCP Apps messages, with a strict sandbox policy) and presses its buttons.
-// Screenshots go to build/try-viewer/. Copy really copies (the clipboard gets a test slide).
+// chat host (a browser page speaking the MCP Apps messages, with a strict sandbox policy) and presses its buttons:
+// Next, Copy all, Copy, Copy caption and, for a video (with written music), HD version.
+// Screenshots go to build/try-viewer/. Copy really copies (the clipboard ends up with the test caption).
 //   node scripts/try-viewer.mjs [images|video|final]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,9 +19,10 @@ const client = new Client({ name: 'try-viewer', version: '0' }, { capabilities: 
 await client.connect(new StdioClientTransport({ command: process.execPath, args: [process.env.MS_SERVER || path.join(ROOT, 'server', 'index.mjs')], env: { ...process.env, MS_NO_OPEN: '1' }, stderr: 'inherit' }));
 
 const slide = (n, bg) => `<div style="width:1080px;height:1350px;background:${bg};color:#fff;font:700 140px Inter;display:grid;place-items:center">Slide ${n}</div>`;
+const caption = 'Still tracking bookings in a diary?\n\nAll in one place, free.\n\n#mehndiartist #anokhireet';
 const args =
   kind === 'images'
-    ? { project: 'viewer test', name: 'test-carousel', kind, size: '1080x1350', pages: [slide(1, '#7a1f2b'), slide(2, '#1f4d3a'), slide(3, '#2b3a7a')] }
+    ? { project: 'viewer test', name: 'test-carousel', kind, size: '1080x1350', caption, pages: [slide(1, '#7a1f2b'), slide(2, '#1f4d3a'), slide(3, '#2b3a7a')] }
     : {
         project: 'viewer test',
         name: 'test-video',
@@ -28,8 +30,16 @@ const args =
         size: '1080x1920',
         duration: 9,
         quality: process.argv[2] === 'final' ? 'final' : 'preview',
+        caption,
         html: '<style>body{margin:0;background:#7a1f2b}.dot{position:absolute;top:860px;left:0;width:200px;height:200px;border-radius:50%;background:#f3e6d0;animation:go 9s linear forwards}@keyframes go{to{left:880px}}h1{font:700 110px Inter;color:#fff;text-align:center;margin-top:300px}</style><h1>Test video</h1><div class="dot"></div>',
+        music: { tempo: 100, key: 'D', parts: [{ play: 'tanpura', from: 0, to: 9 }, { play: 'tabla', from: 0, to: 7.2, pattern: 'dha ge na ti | na ke dhi na' }, { play: 'santoor', from: 2.4, to: 7.2, pattern: 'D5 . F5 A5 | G5 - F5 E5' }, { play: 'bell', at: [7.2] }] },
       };
+// what the laptop's clipboard holds now (Windows): the files on it, or its text
+const clipboard = async () => {
+  if (process.platform !== 'win32') return 'not checked on this system';
+  const { execFileSync } = await import('node:child_process');
+  return execFileSync('powershell.exe', ['-NoProfile', '-STA', '-Command', 'Add-Type -AssemblyName System.Windows.Forms; $f = [System.Windows.Forms.Clipboard]::GetFileDropList(); if ($f.Count) { "files: " + (($f | ForEach-Object { Split-Path $_ -Leaf }) -join ", ") } else { "text: " + [System.Windows.Forms.Clipboard]::GetText() }'], { encoding: 'utf8' }).trim().replace(/\r?\n/g, ' / ');
+};
 
 const t0 = Date.now();
 const result = await client.callTool({ name: 'export', arguments: args }, undefined, { timeout: 600000 });
@@ -104,9 +114,10 @@ if (kind === 'images') {
   await page.waitForTimeout(1200);
   console.log(`after Next: counter "${await view.locator('#count').textContent()}", Claude was told: ${await page.evaluate(() => window.told ?? 'nothing')}`);
   await page.screenshot({ path: path.join(OUT, '2-next.png') });
-  await view.locator('#downloadAll').click();
-  await view.waitForFunction(() => /Downloaded|cancelled|Couldn/.test(document.querySelector('#status').textContent), null, { timeout: 60000 });
-  console.log(`Download all: ${JSON.stringify(await page.evaluate(() => window.downloads))}; status "${await status()}"`);
+  console.log(`buttons: ${await view.evaluate(() => [...document.querySelectorAll('.actions button:not([hidden])')].map((b) => b.textContent.trim() || b.getAttribute('aria-label')).join(' | '))}`);
+  await view.locator('#copyAll').click();
+  await view.waitForFunction(() => /Copied|Couldn/.test(document.querySelector('#status').textContent), null, { timeout: 30000 });
+  console.log(`Copy all: "${await status()}"; clipboard ${await clipboard()}`);
 } else {
   if (result._meta?.['marketing-studio/view']?.job) {
     await view.waitForFunction(() => /%/.test(document.querySelector('#meta').textContent), null, { timeout: 60000 });
@@ -118,10 +129,25 @@ if (kind === 'images') {
   await view.evaluate(() => { const v = document.querySelector('video'); v.currentTime = 4; });
   await page.waitForTimeout(800);
   await page.screenshot({ path: path.join(OUT, '1-video.png') });
+  console.log(`buttons: ${await view.evaluate(() => [...document.querySelectorAll('.actions button:not([hidden])')].map((b) => b.textContent.trim() || b.getAttribute('aria-label')).join(' | '))}`);
+  console.log(`export said: ${result.content[0].text.split('\n').filter((l) => /sound|Music|Parts/.test(l)).join(' / ')}`);
+  // the HD version, made in place from the preview
+  if (await view.locator('#final').isVisible()) {
+    const t1 = Date.now();
+    await view.locator('#final').click();
+    await view.waitForFunction(() => /HD version/.test(document.querySelector('#title').textContent), null, { timeout: 30000 });
+    console.log(`HD version pressed: "${await view.locator('#title').textContent()}" ${await view.locator('#meta').textContent()}`);
+    await view.waitForFunction(() => /^Final/.test(document.querySelector('#meta').textContent) && document.querySelector('video')?.readyState >= 1, null, { timeout: 600000, polling: 1000 });
+    console.log(`after ${((Date.now() - t1) / 1000).toFixed(0)} s: "${await view.locator('#meta').textContent()}", HD button ${(await view.locator('#final').isVisible()) ? 'still there' : 'gone'}; Claude was told: ${await page.evaluate(() => window.told ?? 'nothing')}`);
+    await page.screenshot({ path: path.join(OUT, '2-final.png') });
+  }
 }
 await view.locator('#copy').click();
 await view.waitForFunction(() => /Copied|Couldn/.test(document.querySelector('#status').textContent), null, { timeout: 30000 });
-console.log(`Copy: "${await status()}"`);
+console.log(`Copy: "${await status()}"; clipboard ${await clipboard()}`);
+await view.locator('#copyCaption').click();
+await view.waitForFunction(() => /caption|Couldn/.test(document.querySelector('#status').textContent), null, { timeout: 30000 });
+console.log(`Copy caption: "${await status()}"; clipboard ${await clipboard()}`);
 console.log(`messages from the viewer: ${[...new Set(await page.evaluate(() => window.seen))].join(', ')}`);
 console.log(problems.length ? `PROBLEMS:\n${problems.join('\n')}` : 'no errors in the page');
 console.log(`screenshots: ${OUT}`);

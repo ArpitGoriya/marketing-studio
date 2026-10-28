@@ -26,7 +26,8 @@ Just say what you want, for example:
 Claude will:
 1. ask a few questions and suggest the idea;
 2. look at the app pages and show you quick screenshots;
-3. design it and show you the result **right in the chat**: swipe through the slides, or play the video;
+3. design it, check it privately (text sizes, empty space, screens big enough to read) and show you the result
+   **right in the chat**, once: swipe through the slides, or play the video;
 4. change anything you ask ("shorter headline on slide 2", "use the green outfit instead"). Looking at a slide and
    saying "make this one shorter" works too: Claude knows which slide you're on.
 
@@ -35,9 +36,12 @@ The first time a result shows, Claude asks to display it: click **Always allow**
 ## Using a finished piece
 
 Under each result in the chat:
-- **Copy**: puts the slide (or video) on your clipboard. Paste it straight into WhatsApp, Canva or an email.
-- **Download** / **Download all**: saves the files where you choose.
-- **Show in folder**: opens the folder with the files.
+- **Copy slide** / **Copy video**: puts it on your clipboard. Paste it straight into WhatsApp, Canva or an email.
+- **Copy all**: puts every slide on the clipboard as files, in order (paste them into WhatsApp, an email or a folder).
+- **Copy caption**: the post text Claude wrote for it, ready to paste under the post.
+- **HD version** (videos): the first video is a quick half-size preview. When it looks right, press this and the
+  full-quality video replaces it in the same place.
+- **Show in folder**: opens the folder with the files (they're already saved on your laptop).
 
 Want an earlier piece back? Ask *show me the calculator carousel again*.
 
@@ -48,8 +52,13 @@ itself, new pages included. Or copy the link from your browser's address bar and
 
 ## A voiceover or music
 
-Chat can't take audio files, so when Claude asks, it opens an **Inbox** folder. Drop your file there (MP3, M4A or
-WAV), paste the script into the chat, and say "done". Claude times the video to your voice.
+- **Music made for your video:** just ask, e.g. *add some warm Indian music* or *upbeat music with tabla*. Claude
+  writes it to fit the video (real instruments: tabla, santoor, sitar, tanpura, strings…) and you hear it in the
+  preview. Ask for changes like any other ("softer", "more tabla", "no music at the end").
+- **Your own voiceover or song:** chat can't take audio files, so when Claude asks, it opens an **Inbox** folder.
+  Drop your file there (MP3, M4A or WAV), paste the script into the chat, and say "done". Claude times the video to
+  your voice.
+- If you ask for neither, the video has no sound.
 
 ## Where are my files?
 

@@ -23,7 +23,8 @@
       "vendor_approved_popup_seen": "true"
     }
   },
-  "device_css": ":root { --safe-top: 59px !important; --safe-bottom: 34px !important; } .snap-x, .snap-mandatory, .snap-y { scroll-snap-type: none !important; } nextjs-portal, [data-nextjs-toast], [data-next-badge-root] { display: none !important; }",
+  "device_css": ":root { --safe-top: 0px !important; --safe-bottom: 0px !important; } .snap-x, .snap-mandatory, .snap-y { scroll-snap-type: none !important; } nextjs-portal, [data-nextjs-toast], [data-next-badge-root] { display: none !important; }",
+  "notch_css": ":root { --safe-top: 59px !important; --safe-bottom: 34px !important; }",
   "maintenance_path": "/coming-soon",
   "allow_writes_to": [
     "supabase\\.co/auth/v1/token",

@@ -59,6 +59,11 @@
   button.icon { width: 36px; padding: 0; justify-content: center; }
   button:disabled { opacity: 0.45; cursor: default; }
   button svg { width: 16px; height: 16px; flex: none; }
+  .caption { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius); background: var(--panel); display: flex; gap: 10px; align-items: flex-start; }
+  .caption p { margin: 0; flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+  .caption.open p { display: block; }
+  .caption .more { min-height: 0; padding: 0; border: 0; background: none; color: var(--ink-3); text-decoration: underline; font-size: var(--font-text-xs-size, 12px); }
+  .caption .stack { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
   .status { margin-top: 8px; min-height: 1.4em; font-size: var(--font-text-xs-size, 12px); color: var(--ink-3); }
   .status.ok { color: var(--ok); }
   .status.bad { color: var(--bad); }
@@ -78,11 +83,15 @@
     </div>
     <div class="actions">
       <button class="primary" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>Copy</button>
-      <button id="download" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></svg>Download</button>
-      <button id="downloadAll" hidden>Download all</button>
+      <button id="copyAll" hidden>Copy all</button>
+      <button id="final" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9Z"/></svg>HD version</button>
       <button id="folder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>Show in folder</button>
       <button class="icon" id="full" hidden aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
     </div>
+  </div>
+  <div class="caption" id="caption" hidden>
+    <p id="captionText"></p>
+    <div class="stack"><button id="copyCaption">Copy caption</button><button class="more" id="captionMore" hidden>Show all</button></div>
   </div>
   <div class="status" id="status" role="status"></div>
 </div>
@@ -91,7 +100,7 @@
   const KEY = 'marketing-studio/view';
   const { App, applyDocumentTheme, applyHostStyleVariables, applyHostFonts } = window.McpExtApps;
   const $ = (id) => document.getElementById(id);
-  const app = new App({ name: 'Marketing Studio viewer', version: '1.1.0' }, { availableDisplayModes: ['inline', 'fullscreen'] });
+  const app = new App({ name: 'Marketing Studio viewer', version: '1.2.0' }, { availableDisplayModes: ['inline', 'fullscreen'] });
 
   let input = {}; // the tool call's arguments: project, name, kind, size
   let view = null; // the export being shown
@@ -147,12 +156,6 @@
     files.set(uri, f);
     return f;
   }
-  const base64Of = async (blob) => {
-    const u = new Uint8Array(await blob.arrayBuffer());
-    let s = '';
-    for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
-    return btoa(s);
-  };
 
   // ---- host look and layout
   function applyContext(ctx) {
@@ -177,8 +180,8 @@
     if (/square|1.?1/i.test(input.size ?? '')) return 1;
     return 4 / 5;
   }
-  function showWaiting(message, progress) {
-    $('title').textContent = input.kind === 'video' ? 'Making your video' : 'Making your slides';
+  function showWaiting(message, progress, title) {
+    $('title').textContent = title ?? (input.kind === 'video' ? 'Making your video' : 'Making your slides');
     $('meta').textContent = progress == null ? '' : `${Math.round(progress * 100)}%`;
     $('bar').hidden = true;
     const st = $('stage');
@@ -199,12 +202,17 @@
   async function handle(result) {
     if (result?.isError) return showProblem(textOf(result));
     const d = result?._meta?.[KEY] ?? result?.structuredContent?.[KEY];
+    // a preview whose HD version was made since (with the button here) shows the HD one
+    if (d?.video?.quality === 'preview') {
+      const now = await callApp('viewer_latest', { project: d.project, name: d.name }).then((r) => r.structuredContent.view).catch(() => null);
+      return show(now?.name === d.name && now.video?.quality === 'final' ? now : d);
+    }
     if (d?.items || d?.video) return show(d);
     const job = d?.job ?? /job "([\w-]+)"/.exec(textOf(result))?.[1];
     if (job) return follow(job);
     return latest();
   }
-  async function follow(job) {
+  async function follow(job, title) {
     for (;;) {
       let s;
       try {
@@ -213,7 +221,7 @@
         return showProblem(e.message);
       }
       if (s.state === 'running') {
-        showWaiting(s.message, s.progress);
+        showWaiting(s.message, s.progress, title);
         await sleep(1500);
       } else if (s.state === 'done' && s.view) return show(s.view);
       else if (s.state === 'failed') return showProblem(s.error);
@@ -279,14 +287,25 @@
         return showProblem(e.message);
       }
     }
+    showCaption(d.caption);
     setBar();
     say(
       d.kind === 'images'
-        ? 'Ask Claude in the chat for any changes. Copy pastes it straight into WhatsApp, Canva or an email.'
+        ? 'Ask Claude in the chat for any changes. Copy pastes a slide straight into WhatsApp, Canva or an email; Copy all puts every slide on the clipboard as files.'
         : d.video.quality === 'final'
           ? 'Ask Claude in the chat for any changes. Copy puts the video file on the clipboard, ready to paste into WhatsApp.'
-          : 'A quick, half-size preview. Ask Claude for changes, or for the final when it looks right.',
+          : d.video.canFinal
+            ? 'A quick, half-size preview. Ask Claude for changes, or press HD version when it looks right.'
+            : 'A quick, half-size preview. Ask Claude for changes, or for the final when it looks right.',
     );
+  }
+
+  function showCaption(text) {
+    $('caption').hidden = !text;
+    if (!text) return;
+    $('captionText').textContent = text;
+    $('caption').classList.remove('open');
+    requestAnimationFrame(() => ($('captionMore').hidden = $('captionText').scrollHeight <= $('captionText').clientHeight + 2));
   }
 
   async function loadSlide(el, it) {
@@ -352,9 +371,9 @@
     $('count').textContent = `${index + 1} / ${n}`;
     $('prev').disabled = index <= 0;
     $('next').disabled = index >= n - 1;
-    $('download').hidden = !can('downloadFile');
-    $('downloadAll').hidden = !can('downloadFile') || !slides || n < 2;
-    $('copy').lastChild.textContent = slides && n > 1 ? `Copy slide ${index + 1}` : 'Copy';
+    $('copyAll').hidden = !slides || n < 2;
+    $('final').hidden = !(view?.kind === 'video' && view.video.canFinal);
+    $('copy').lastChild.textContent = slides ? (n > 1 ? `Copy slide ${index + 1}` : 'Copy') : 'Copy video';
     // let Claude know which slide the person means by "this one"
     clearTimeout(tellTimer);
     if (slides && n > 1 && told !== index && can('updateModelContext'))
@@ -382,26 +401,52 @@
     busy($('copy'), async () => {
       const it = items()[index];
       say('Copying…');
-      await callApp('viewer_copy', { project: view.project, file: it.file });
+      await callApp('viewer_copy', { project: view.project, files: [it.file] });
       say(view.kind === 'images' ? `Copied ${it.label.toLowerCase()}. Paste it into WhatsApp, Canva or an email.` : 'Copied the video file. Paste it into WhatsApp or a folder.', 'ok');
     });
+  $('copyAll').onclick = () =>
+    busy($('copyAll'), async () => {
+      const list = items();
+      say('Copying…');
+      await callApp('viewer_copy', { project: view.project, files: list.map((it) => it.file) });
+      say(`Copied all ${list.length} slides as files, in order. Paste them into WhatsApp, an email or a folder.`, 'ok');
+    });
+  $('copyCaption').onclick = () =>
+    busy($('copyCaption'), async () => {
+      await callApp('viewer_copy', { project: view.project, caption: view.name });
+      say('Copied the caption. Paste it under the post.', 'ok');
+    });
+  $('captionMore').onclick = () => {
+    const open = $('caption').classList.toggle('open');
+    $('captionMore').textContent = open ? 'Show less' : 'Show all';
+  };
   $('folder').onclick = () =>
     busy($('folder'), async () => {
       await callApp('viewer_folder', { project: view.project, file: items()[index].file });
       say('Opened the folder on this laptop.', 'ok');
     });
-  async function download(list) {
-    say(list.length > 1 ? `Getting ${list.length} files ready…` : 'Getting it ready…');
-    const contents = [];
-    for (const it of list) {
-      const { blob } = await fetchFile(it.src);
-      contents.push({ type: 'resource', resource: { uri: `file:///${it.name}`, mimeType: it.mime, blob: await base64Of(blob) } });
+  // the final video from this preview, made right here (Claude is told when it's ready)
+  $('final').onclick = async () => {
+    const was = view;
+    $('final').disabled = true;
+    try {
+      const { job } = (await callApp('viewer_final', { project: was.project, name: was.name })).structuredContent;
+      await follow(job, 'Making the HD version');
+      if (view === was) {
+        // it didn't work: back to the preview, with the reason
+        const why = $('status').textContent;
+        await show(was);
+        return say(why || "Couldn't make the HD version. Ask Claude in the chat for the final.", 'bad');
+      }
+      if (view?.kind === 'video' && view.video.quality === 'final' && can('updateModelContext'))
+        app.updateModelContext({ content: [{ type: 'text', text: `The person pressed "HD version" in the Marketing Studio viewer: the final video of "${view.name}" (project "${view.title}") is made and showing in the chat. No need to export it again.` }] }).catch(() => {});
+    } catch (e) {
+      say(e.message, 'bad');
+    } finally {
+      $('final').disabled = false;
+      setBar();
     }
-    const r = await app.downloadFile({ contents });
-    say(r?.isError ? 'Download cancelled.' : list.length > 1 ? `Downloaded ${list.length} files.` : 'Downloaded.', r?.isError ? '' : 'ok');
-  }
-  $('download').onclick = () => busy($('download'), () => download([items()[index]]));
-  $('downloadAll').onclick = () => busy($('downloadAll'), () => download(items()));
+  };
   $('full').onclick = () => app.requestDisplayMode({ mode: fullscreen ? 'inline' : 'fullscreen' }).then((r) => applyContext({ ...app.getHostContext(), displayMode: r.mode })).catch(() => {});
 
   // ---- connect (handlers first, so the first notifications aren't missed)

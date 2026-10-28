@@ -26,7 +26,7 @@ async function doRecord(a, update) {
     const quality = a.quality ?? 'preview';
     const fps = a.fps ?? FPS[quality];
     const b = await getBrowser();
-    const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in });
+    const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in, notch: !!a.notch });
     context = made.context;
     if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
     update(0.02, 'opening the page');
@@ -71,6 +71,7 @@ async function doRecord(a, update) {
       page: url,
       device,
       logged_in: !!a.logged_in,
+      notch: !!a.notch,
       setup: a.setup ?? [],
       steps: a.steps ?? [],
       [quality]: { frames: path.relative(p.dir, dir), count: rec.n, fps, seconds: +(rec.n / fps).toFixed(2), width: stats.width, height: stats.height, mp4: path.relative(p.dir, mp4) },

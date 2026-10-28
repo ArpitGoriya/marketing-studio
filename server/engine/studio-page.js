@@ -68,7 +68,26 @@
     return out;
   }
 
+  // 16-bit stereo WAV of two channels
+  function wav(ch) {
+    const n = ch[0].length;
+    const buf = new ArrayBuffer(44 + n * 4);
+    const v = new DataView(buf);
+    const str = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    str(0, 'RIFF'); v.setUint32(4, 36 + n * 4, true); str(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+    v.setUint32(24, SR, true); v.setUint32(28, SR * 4, true); v.setUint16(32, 4, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 4, true);
+    for (let i = 0; i < n; i++) for (let c = 0; c < 2; c++) v.setInt16(44 + i * 4 + c * 2, Math.max(-1, Math.min(1, ch[c][i])) * 32767, true);
+    return buf;
+  }
+
   window.studio = {
+    // written music on its own (music-page.js): loudness and peak, and a WAV posted to `wavOut` if given
+    async music(plan, urls, wavOut) {
+      const ch = await window.studioMusic.render(plan, urls);
+      if (wavOut) await fetch(wavOut, { method: 'POST', body: wav(ch) });
+      return { lufs: +lufs(ch).toFixed(1), peak: +peakDb(ch).toFixed(1), seconds: +(ch[0].length / SR).toFixed(2) };
+    },
+
     async analyse(url) {
       const ch = await decode(url);
       const duration = ch[0].length / SR;
@@ -99,7 +118,9 @@
         for (let i = 0; i < n; i++) { const a = (out[0][i] + out[1][i]) / 2; acc += a * a; if (i >= win) { const b = (out[0][i - win] + out[1][i - win]) / 2; acc -= b * b; } vEnv[i] = Math.sqrt(Math.max(0, acc) / win); }
       }
       if (music) {
-        const m = gainTo(await decode(music.url), voice ? -26 + (music.volume_db ?? 0) : -16 + (music.volume_db ?? 0));
+        // a supplied track, or music Claude wrote, played with the kit (music-page.js)
+        const raw = music.plan ? await window.studioMusic.render(music.plan, music.urls) : await decode(music.url);
+        const m = gainTo(raw, voice ? -26 + (music.volume_db ?? 0) : -16 + (music.volume_db ?? 0));
         const from = Math.round((music.start ?? 0) * SR);
         const fade = Math.round(1.5 * SR);
         const thr = 10 ** (-42 / 20), low = 10 ** (-(music.duck_db ?? 6) / 20), down = Math.exp(-1 / (0.06 * SR)), up = Math.exp(-1 / (0.4 * SR));

@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { brands, INBOX } from '../paths.mjs';
 import { getBrowser } from './browser.mjs';
+import { LINT_SOURCE } from './checks.mjs';
 import { CaptureStop } from './site.mjs';
 
 const HOST = 'https://studio.local';
@@ -160,8 +161,11 @@ export function prepare(project, brand, sources, { width, height, video }) {
   return { pages: out.map((o) => wrap(o.html, { width, height, brand, video })), previewOnly: [...new Set(out.flatMap((o) => o.previewOnly))] };
 }
 
-// slides -> PNG files; returns [{ file, buf }]
-export async function exportImages({ project, brand, pages, width, height, scale = 1, outDir, onProgress = noop }) {
+// the layout check (checks.mjs) on the page as it is now
+const lintPage = (page, lint) => (lint ? page.evaluate(`${LINT_SOURCE}(${JSON.stringify(lint)})`).catch((e) => (console.error('[marketing-studio] layout check:', e.message), [])) : []);
+
+// slides -> PNG files; returns [{ file, buf, findings }]. outDir null: nothing is saved (a check)
+export async function exportImages({ project, brand, pages, width, height, scale = 1, outDir, lint, onProgress = noop }) {
   const { context, blocked } = await exportContext({ project, brand, pages, width, height, scale });
   const files = [];
   try {
@@ -170,10 +174,11 @@ export async function exportImages({ project, brand, pages, width, height, scale
       await page.goto(`${HOST}/page/${i}`, { waitUntil: 'load' });
       await ready(page);
       await page.waitForTimeout(150);
+      const findings = await lintPage(page, lint);
       const buf = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width, height }, animations: 'disabled' });
-      const file = path.join(outDir, `${String(i + 1).padStart(2, '0')}.png`);
-      fs.writeFileSync(file, buf);
-      files.push({ file, buf });
+      const file = outDir && path.join(outDir, `${String(i + 1).padStart(2, '0')}.png`);
+      if (file) fs.writeFileSync(file, buf);
+      files.push({ file, buf, findings });
       await page.close();
       onProgress((i + 1) / pages.length);
     }
@@ -183,14 +188,18 @@ export async function exportImages({ project, brand, pages, width, height, scale
   return { files, blocked: [...blocked] };
 }
 
-// one animated page -> frames (JPEG) on the stepped clock; returns the frame files
-export async function exportFrames({ project, brand, page: html, width, height, scale, fps, duration, framesDir, onProgress = noop }) {
+// one animated page -> frames (JPEG) on the stepped clock; returns the frame files and, with `lint`, the layout
+// check at the middle of every second ({ t, list, file }). `times`: only those moments (seconds), for a check.
+export async function exportFrames({ project, brand, page: html, width, height, scale, fps, duration, framesDir, lint, times, onProgress = noop }) {
   const { context, blocked } = await exportContext({ project, brand, pages: [html], width, height, scale, video: true });
   const n = Math.max(1, Math.round(duration * fps));
   const dt = 1000 / fps;
   fs.rmSync(framesDir, { recursive: true, force: true });
   fs.mkdirSync(framesDir, { recursive: true });
   const files = [];
+  const moments = [];
+  const sampled = new Map();
+  for (let t = 0.5; t < duration; t += 1) sampled.set(Math.round(t * fps), t);
   try {
     const page = await context.newPage();
     await page.clock.install();
@@ -218,19 +227,40 @@ export async function exportFrames({ project, brand, page: html, width, height, 
       };
       for (const a of document.getAnimations()) { try { a.pause(); a.currentTime = 0; } catch {} }
     });
-    for (let i = 0; i < n; i++) {
-      if (i > 0) {
-        await page.clock.runFor(dt);
-        await page.evaluate((d) => ms.step(d), dt);
-      }
+    const shot = async (name) => {
       await page.evaluate(() => ms.updateClips());
-      const file = path.join(framesDir, `${String(i).padStart(4, '0')}.jpg`);
+      const file = path.join(framesDir, `${name}.jpg`);
       await page.screenshot({ path: file, type: 'jpeg', quality: 90, clip: { x: 0, y: 0, width, height }, animations: 'allow', caret: 'hide' });
-      files.push(file);
-      if (i % 10 === 0) onProgress(i / n);
-    }
+      return file;
+    };
+    if (times) {
+      // a check: jump from moment to moment (animations and the clock move together, so each moment is exact)
+      let now = 0;
+      for (const [k, t] of [...times].sort((a, b) => a - b).entries()) {
+        const d = Math.round(t * 1000 - now);
+        if (d > 0) {
+          await page.clock.runFor(d);
+          await page.evaluate((dd) => ms.step(dd), d);
+          now += d;
+        }
+        const file = await shot(String(k).padStart(4, '0'));
+        files.push(file);
+        moments.push({ t: +t.toFixed(2), list: await lintPage(page, lint), file });
+        onProgress((k + 1) / times.length);
+      }
+    } else
+      for (let i = 0; i < n; i++) {
+        if (i > 0) {
+          await page.clock.runFor(dt);
+          await page.evaluate((d) => ms.step(d), dt);
+        }
+        const file = await shot(String(i).padStart(4, '0'));
+        files.push(file);
+        if (lint && sampled.has(i)) moments.push({ t: sampled.get(i), list: await lintPage(page, lint), file });
+        if (i % 10 === 0) onProgress(i / n);
+      }
   } finally {
     await context.close().catch(() => {});
   }
-  return { files, blocked: [...blocked] };
+  return { files, moments, blocked: [...blocked] };
 }

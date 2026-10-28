@@ -1,0 +1,409 @@
+{
+ "rate": 48000,
+ "instruments": {
+  "harp": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 34.84,
+     "file": "harp/35.ogg"
+    },
+    {
+     "midi": 37.94,
+     "file": "harp/38.ogg"
+    },
+    {
+     "midi": 44.94,
+     "file": "harp/45.ogg"
+    },
+    {
+     "midi": 51.93,
+     "file": "harp/52.ogg"
+    },
+    {
+     "midi": 58.88,
+     "file": "harp/59.ogg"
+    },
+    {
+     "midi": 65.0,
+     "file": "harp/65.ogg"
+    },
+    {
+     "midi": 71.89,
+     "file": "harp/72.ogg"
+    },
+    {
+     "midi": 78.94,
+     "file": "harp/79.ogg"
+    },
+    {
+     "midi": 85.93,
+     "file": "harp/86.ogg"
+    },
+    {
+     "midi": 92.83,
+     "file": "harp/93.ogg"
+    }
+   ]
+  },
+  "flute": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 59.99,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/60.ogg"
+    },
+    {
+     "midi": 64.0,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/64.ogg"
+    },
+    {
+     "midi": 69.01,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/69.ogg"
+    },
+    {
+     "midi": 72.01,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/72.ogg"
+    },
+    {
+     "midi": 76.0,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/76.ogg"
+    },
+    {
+     "midi": 81.0,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/81.ogg"
+    },
+    {
+     "midi": 83.99,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/84.ogg"
+    },
+    {
+     "midi": 88.0,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/88.ogg"
+    },
+    {
+     "midi": 93.0,
+     "loop": [
+      1.0,
+      3.1
+     ],
+     "file": "flute/93.ogg"
+    }
+   ]
+  },
+  "harmonium": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 43.06,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/43.ogg"
+    },
+    {
+     "midi": 48.05,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/48.ogg"
+    },
+    {
+     "midi": 51.04,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/51.ogg"
+    },
+    {
+     "midi": 56.06,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/56.ogg"
+    },
+    {
+     "midi": 63.08,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/63.ogg"
+    },
+    {
+     "midi": 67.07,
+     "loop": [
+      1.1,
+      3.9
+     ],
+     "file": "harmonium/67.ogg"
+    }
+   ]
+  },
+  "pizz": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 54.96,
+     "file": "pizz/55.ogg"
+    },
+    {
+     "midi": 62.01,
+     "file": "pizz/62.ogg"
+    },
+    {
+     "midi": 69.0,
+     "file": "pizz/69.ogg"
+    },
+    {
+     "midi": 75.93,
+     "file": "pizz/76.ogg"
+    },
+    {
+     "midi": 82.93,
+     "file": "pizz/83.ogg"
+    }
+   ]
+  },
+  "strings": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 36.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/36.ogg"
+    },
+    {
+     "midi": 42.99,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/43.ogg"
+    },
+    {
+     "midi": 50.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/50.ogg"
+    },
+    {
+     "midi": 55.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/55.ogg"
+    },
+    {
+     "midi": 62.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/62.ogg"
+    },
+    {
+     "midi": 66.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/66.ogg"
+    },
+    {
+     "midi": 72.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/72.ogg"
+    },
+    {
+     "midi": 79.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/79.ogg"
+    },
+    {
+     "midi": 86.0,
+     "loop": [
+      1.3,
+      4.1
+     ],
+     "file": "strings/86.ogg"
+    }
+   ]
+  },
+  "sitar": {
+   "kind": "pitched",
+   "zones": [
+    {
+     "midi": 48.01,
+     "file": "sitar/48.ogg"
+    }
+   ]
+  },
+  "tanpura": {
+   "kind": "drone",
+   "midi": 38,
+   "zones": [
+    {
+     "midi": 38,
+     "loop": [
+      2.0,
+      24.0
+     ],
+     "file": "tanpura/d.ogg"
+    }
+   ]
+  },
+  "tabla": {
+   "kind": "drum",
+   "tuned": 62,
+   "bols": {
+    "na": [
+     "tabla/na.ogg"
+    ],
+    "tin": [
+     "tabla/tin.ogg"
+    ],
+    "tun": [
+     "tabla/tun.ogg"
+    ],
+    "te": [
+     "tabla/te.ogg"
+    ],
+    "re": [
+     "tabla/re.ogg"
+    ],
+    "naopen": [
+     "tabla/naopen.ogg"
+    ],
+    "ke": [
+     "tabla/ke-2.ogg",
+     "tabla/ke-3.ogg"
+    ],
+    "dha": [
+     "tabla/dha-1.ogg",
+     "tabla/dha-2.ogg",
+     "tabla/dha-3.ogg"
+    ]
+   }
+  },
+  "dholak": {
+   "kind": "drum",
+   "tuned": 62,
+   "bols": {
+    "ga": [
+     "dholak/ga.ogg"
+    ],
+    "ta": [
+     "dholak/ta.ogg"
+    ]
+   }
+  },
+  "shaker": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "shaker/1.ogg",
+     "shaker/2.ogg",
+     "shaker/3.ogg"
+    ]
+   }
+  },
+  "clap": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "clap/1.ogg",
+     "clap/2.ogg",
+     "clap/3.ogg"
+    ]
+   }
+  },
+  "ghungroo": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "ghungroo/1.ogg",
+     "ghungroo/2.ogg",
+     "ghungroo/3.ogg",
+     "ghungroo/4.ogg",
+     "ghungroo/5.ogg",
+     "ghungroo/6.ogg"
+    ]
+   }
+  },
+  "bell": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "bell/1.ogg",
+     "bell/2.ogg"
+    ]
+   }
+  },
+  "manjira": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "manjira/1.ogg"
+    ]
+   }
+  },
+  "daf": {
+   "kind": "drum",
+   "bols": {
+    "x": [
+     "daf/1.ogg",
+     "daf/2.ogg"
+    ]
+   }
+  }
+ }
+}

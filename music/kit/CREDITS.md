@@ -1,0 +1,70 @@
+# Music kit sources
+
+Every sound is CC0 (public domain): free to use, change and share, no credit needed. Kept here for provenance. Built by scripts/music-kit/build_kit.py.
+
+- VCSL/Idiophones/Struck Idiophones/Claps/Clap_rr1.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Idiophones/Struck Idiophones/Claps/Clap_rr2.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Idiophones/Struck Idiophones/Claps/Clap_rr3.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Idiophones/Struck Idiophones/Finger Cymbals/Fing_Cymb.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Idiophones/Struck Idiophones/Hand Bells, Nepalese/HB_1.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Idiophones/Struck Idiophones/Hand Bells, Nepalese/HB_2.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Membranophones/Struck Membranophones/Frame Drum/HDrumL_Hit_v3_rr1_Sum.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VCSL/Membranophones/Struck Membranophones/Frame Drum/HDrumL_Hit_v3_rr2_Sum.wav: Versilian Community Sample Library (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Cello Section/susvib/susvib_C1_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Cello Section/susvib/susvib_D2_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Cello Section/susvib/susvib_G1_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_A2_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_A6_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_B1_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_B3_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_C5_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_D2_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_D6_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_E3_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_F4_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Harp/KSHarp_G5_mf.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Viola Section/susvib/ViolaEns_susvib_D3_v2_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Viola Section/susvib/ViolaEns_susvib_G2_v2_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/Pizz/VlnEns_Pizz_A3_v1_rr1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/Pizz/VlnEns_Pizz_B4_v1_rr1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/Pizz/VlnEns_Pizz_D3_v2_rr1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/Pizz/VlnEns_Pizz_E4_v2_rr1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/Pizz/VlnEns_Pizz_G2_v2_rr1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/susVib/VlnEns_susVib_C4_v1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/susVib/VlnEns_susVib_D5_v1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/susVib/VlnEns_susVib_F#3_v1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Strings/Violin Section/susVib/VlnEns_susVib_G4_v1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/expvib/LDFlute_expvib_C4_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/expvib/LDFlute_expvib_E5_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_A3_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_A4_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_A5_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_C3_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_C5_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_E3_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- VSCO-2-CE/Woodwinds/Flute/susvib/LDFlute_susvib_E4_v1_1.wav: VSCO-2 Community Edition (CC0), Versilian Studios
+- freesound/dholak/536871.ogg: Freesound #536871 "DHOLAK (TREBLE SKIN)" by curesforbrokenhearts, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/curesforbrokenhearts/sounds/536871/)
+- freesound/dholak/536872.ogg: Freesound #536872 "DHOLAK (BASS SKIN)" by curesforbrokenhearts, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/curesforbrokenhearts/sounds/536872/)
+- freesound/ghungroo/365406.ogg: Freesound #365406 "Indian_Gungroos_Ankle_Bells_Improv.wav" by RutgerMuller, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/RutgerMuller/sounds/365406/)
+- freesound/harmonium/523878.ogg: Freesound #523878 "Harmonium-C3" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523878/)
+- freesound/harmonium/523879.ogg: Freesound #523879 "Harmonium-D#4" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523879/)
+- freesound/harmonium/523880.ogg: Freesound #523880 "Harmonium-D#3" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523880/)
+- freesound/harmonium/523881.ogg: Freesound #523881 "Harmonium-G4" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523881/)
+- freesound/harmonium/523887.ogg: Freesound #523887 "Harmonium-G#3" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523887/)
+- freesound/harmonium/523889.ogg: Freesound #523889 "Harmonium-G2" by cabled_mess, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/cabled_mess/sounds/523889/)
+- freesound/shaker/432205.ogg: Freesound #432205 "RHYTHMIX SHAKER" by curesforbrokenhearts, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/curesforbrokenhearts/sounds/432205/)
+- freesound/shaker/432206.ogg: Freesound #432206 "EGG SHAKER" by curesforbrokenhearts, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/curesforbrokenhearts/sounds/432206/)
+- freesound/shaker/579669.ogg: Freesound #579669 "PLASTIC EGG SHAKER" by curesforbrokenhearts, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/curesforbrokenhearts/sounds/579669/)
+- freesound/sitar/32803.ogg: Freesound #32803 "sitar j.wav" by JOHNWALLY, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/JOHNWALLY/sounds/32803/)
+- freesound/tabla/130419.ogg: Freesound #130419 "tun_2.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130419/)
+- freesound/tabla/130422.ogg: Freesound #130422 "na-open.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130422/)
+- freesound/tabla/130423.ogg: Freesound #130423 "ke_3.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130423/)
+- freesound/tabla/130424.ogg: Freesound #130424 "ke_2.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130424/)
+- freesound/tabla/130425.ogg: Freesound #130425 "tas_2.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130425/)
+- freesound/tabla/130427.ogg: Freesound #130427 "re.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130427/)
+- freesound/tabla/130428.ogg: Freesound #130428 "na_sharp.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130428/)
+- freesound/tabla/130429.ogg: Freesound #130429 "te.wav" by mmiron, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/mmiron/sounds/130429/)
+- freesound/tabla/345574.ogg: Freesound #345574 "Da_Test03.wav" by subodh3012, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/subodh3012/sounds/345574/)
+- freesound/tabla/345575.ogg: Freesound #345575 "Da_Test02.wav" by subodh3012, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/subodh3012/sounds/345575/)
+- freesound/tabla/345576.ogg: Freesound #345576 "Da_Test01.wav" by subodh3012, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/subodh3012/sounds/345576/)
+- freesound/tanpura/506312.ogg: Freesound #506312 "Tambura_Eb_fat.aiff" by Kaczinski, http://creativecommons.org/publicdomain/zero/1.0/ (https://freesound.org/people/Kaczinski/sounds/506312/)

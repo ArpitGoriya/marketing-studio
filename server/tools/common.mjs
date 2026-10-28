@@ -27,6 +27,10 @@ export const common = {
   device: z.enum(['phone', 'desktop']).optional().describe('phone (default) or desktop.'),
   quality: z.enum(['preview', 'high']).optional().describe('preview (default): small and fast, to look and choose. high: full resolution, for the final design.'),
   logged_in: z.boolean().optional().describe('true for pages behind the login (uses the signed-in demo account).'),
+  notch: z
+    .boolean()
+    .optional()
+    .describe('phone: keep the empty bands a real phone leaves for its notch (top, 59 px) and home bar (bottom, 34 px). Only when your phone frame draws a notch or status bar over the screen. Default: the screen runs edge to edge, no empty bands.'),
 };
 
 export const fail = (e) => {

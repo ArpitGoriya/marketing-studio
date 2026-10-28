@@ -93,8 +93,9 @@ const isSite = (site, url) => {
   }
 };
 
-// a fresh browser context for one capture or recording; returns { context, traffic }
-export async function siteContext(browser, site, { device = 'phone', quality = 'preview', loggedIn = false } = {}) {
+// a fresh browser context for one capture or recording; returns { context, traffic }. notch: leave the room a real
+// phone keeps for its notch and home bar (the site's notch_css); without it the screen runs edge to edge.
+export async function siteContext(browser, site, { device = 'phone', quality = 'preview', loggedIn = false, notch = false } = {}) {
   const dev = DEVICES[device] ?? DEVICES.phone;
   const context = await browser.newContext({
     viewport: dev.viewport,
@@ -166,7 +167,7 @@ export async function siteContext(browser, site, { device = 'phone', quality = '
           document.head.appendChild(s);
         });
     },
-    { ls, css: site.device_css ?? '' },
+    { ls, css: `${site.device_css ?? ''}${notch && device === 'phone' ? ` ${site.notch_css ?? ''}` : ''}` },
   );
   if (loggedIn) await applySession(context, site);
   return { context, traffic, dev };

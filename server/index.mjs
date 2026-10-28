@@ -12,6 +12,7 @@ import { registerBrand } from './tools/brand.mjs';
 import { registerCapture } from './tools/capture.mjs';
 import { registerExport } from './tools/export.mjs';
 import { registerFindPage } from './tools/find_page.mjs';
+import { registerGuide } from './tools/guide.mjs';
 import { registerInbox } from './tools/inbox.mjs';
 import { registerProjects } from './tools/projects.mjs';
 import { registerReadPage } from './tools/read_page.mjs';
@@ -23,6 +24,7 @@ import { registerWait } from './tools/wait.mjs';
 
 const server = new McpServer({ name: 'marketing-studio', title: 'Marketing Studio', version: VERSION }, { instructions: INSTRUCTIONS });
 registerStatus(server);
+registerGuide(server);
 registerFindPage(server);
 registerReadPage(server);
 registerCapture(server);

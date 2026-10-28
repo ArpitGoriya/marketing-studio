@@ -24,7 +24,7 @@ const shotShape = z.object({
 });
 
 // one screenshot of the page as it is now; returns what was saved and shown
-async function shoot(page, shot, { quality, scale, p, url, site, device, loggedIn, baseSteps, fallbackName }) {
+async function shoot(page, shot, { quality, scale, p, url, site, device, loggedIn, notch, baseSteps, fallbackName }) {
   let clip;
   let hidden = 0;
   if (shot.crop) {
@@ -82,6 +82,7 @@ async function shoot(page, shot, { quality, scale, p, url, site, device, loggedI
     page: url,
     device,
     logged_in: loggedIn,
+    notch,
     steps: [...baseSteps, ...(shot.steps ?? [])],
     full_page: !!shot.full_page,
     crop: shot.crop ?? null,
@@ -125,7 +126,7 @@ export function registerCapture(server) {
         const device = a.device ?? 'phone';
         const quality = a.quality ?? 'preview';
         const b = await getBrowser();
-        const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in });
+        const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in, notch: !!a.notch });
         context = made.context;
         const scale = made.dev.scale[quality];
         if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
@@ -136,7 +137,7 @@ export function registerCapture(server) {
         const results = [];
         for (const shot of shots) {
           await runLive(page, site, shot.steps ?? [], { touch: device === 'phone' });
-          results.push(await shoot(page, shot, { quality, scale, p, url, site, device, loggedIn: !!a.logged_in, baseSteps: a.steps ?? [], fallbackName: a.name ?? a.page }));
+          results.push(await shoot(page, shot, { quality, scale, p, url, site, device, loggedIn: !!a.logged_in, notch: !!a.notch, baseSteps: a.steps ?? [], fallbackName: a.name ?? a.page }));
         }
         assertNoWrites(made.traffic);
         if (a.logged_in) await keepSession(page, site);

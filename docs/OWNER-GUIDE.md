@@ -3,28 +3,42 @@
 ## What it is
 
 A Claude desktop extension (MCPB) that runs on each laptop. Claude designs the posts and videos itself; the
-extension gives it twelve tools:
+extension gives it fourteen tools:
 
 | Tool | What it does |
 |---|---|
 | `status` | What's ready: sites and pages, sign-in, brands, projects. |
+| `guide` | The how-to and best practices (carousels, Reels, showing screens big enough, music, captions), from `guide/`. |
 | `brand` | The brand guide, plus a picture of the logos and colours. |
 | `find_page` | Searches the site's live sitemap (and, when signed in, the account menu) once a day, so new pages are found without a new version. |
 | `read_page` | A page as text (headings, buttons, fields), so Claude plans shots without exploring by screenshots. |
-| `capture` | Screenshots, preview first, then high quality; several shots of one page per call. A crop by text grows to the card around it, with fixed bars hidden. |
+| `capture` | Screenshots, preview first, then high quality; several shots of one page per call. A crop by text grows to the card around it, with fixed bars hidden. Phone screens run edge to edge (`notch: true` keeps a real phone's notch and home-bar bands). |
 | `record` | Frame-by-frame screen recordings. |
 | `inbox` | Supplied audio and images. |
-| `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed. The result shows in the chat (see below). |
+| `check` | Renders a design privately for Claude (nothing saved or shown) with a layout check: badly wrapping headlines, cut-off or too-small text, screens too small to read, empty bands, text under the Reels buttons. So Claude fixes its own mistakes before the one export the person sees. |
+| `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed, plus an optional post caption. The same layout check runs on it. The result shows in the chat (see below). |
 | `show` | Shows an earlier export in the chat again. |
 | `projects` | Earlier work. |
 | `sign_in` | Check or redo the sign-in. |
 | `wait` | Results of long jobs. |
 
-Results show **in the chat** in a viewer (an MCP App): slides to swipe through or the video playing, with Copy (to
-the clipboard, so it pastes into WhatsApp or Canva), Download and Show-in-folder buttons. It tells Claude which slide
-is on screen, so "make this one shorter" works. The viewer is part of the extension and loads nothing from the
-internet. Chat apps that can't show it get the old behaviour (pictures in the answer, the folder opens). The viewer
-uses a few tools of its own (`viewer_*`) that Claude doesn't see.
+Results show **in the chat** in a viewer (an MCP App): slides to swipe through or the video playing, with Copy, Copy
+all (every slide as files), Copy caption and Show-in-folder buttons, and for a preview video an **HD version** button
+that makes the final in place (so the chat doesn't get a second copy). It tells Claude which slide is on screen, so
+"make this one shorter" works, and when the HD version is made. The viewer is part of the extension and loads nothing
+from the internet. Chat apps that can't show it get the old behaviour (pictures in the answer, the folder opens). The
+viewer uses a few tools of its own (`viewer_*`) that Claude doesn't see.
+
+**Music.** When someone asks for music, Claude writes a short score and the extension plays it with a small kit of
+real instruments in `music/kit/` (tanpura, tabla, dholak, santoor, sitar, harp, flute, strings, harmonium, bells…,
+2.3 MB) plus a few synth parts. Every sound is CC0 (public domain), from the same sources as the AR 2.0 film's score;
+`music/kit/CREDITS.md` lists each one. `scripts/music-kit/build_kit.py` rebuilds the kit from the film's
+`music/samples-src` (it refuses any sound without a CC0 record). A supplied track in the Inbox is used as before; with
+neither, videos are silent.
+
+**The guide as a Claude skill.** `npm run build` also makes `dist/marketing-studio-skill.zip` from `guide/`. The
+extension already gives Claude the guide through the `guide` tool, so uploading it (Settings → Capabilities →
+Skills) is optional.
 
 Everything is made and saved on the laptop, with nothing hosted:
 - It uses the laptop's own **Chrome or Edge**; video is encoded by the browser, so there's nothing to download. A
@@ -71,13 +85,17 @@ Everything is made and saved on the laptop, with nothing hosted:
 ## Adding a site or a brand
 
 - **Site:** `sites/<id>.json`, the same shape as `anokhireet.json`:
-  - `url`, named `pages`, `start_state` (localStorage), `device_css`;
+  - `url`, named `pages`, `start_state` (localStorage), `device_css`, and `notch_css` (the spacing a real phone's
+    notch and home bar add, used only when Claude asks for `notch: true`);
   - `allow_writes_to`, `never_press`, `maintenance_path`;
   - `login`: `supabase-phone` for automatic sign-in, or `manual`, which opens a window for the person to sign in
     once per laptop.
 - **Brand:** `brands/<id>/brand.json`:
   - colours, gradients, fonts (files in `fonts/`), logos (with `ground`), patterns, rules, `never_say` patterns, sizes;
   - the files themselves.
+- **Anokhi Reet's shop, vendor and tools logos** are exact copies of the website's (`apps/web/public/Shops-Logo`,
+  `Vendors-Logo`, `Tools-Logo` in the monorepo). When those change, run
+  `node scripts/sync-logos.mjs "<path to the monorepo>"`: it copies them in and updates `brand.json`.
 - Rebuild, then upload the new version in admin.
 
 ## Develop and test
@@ -87,7 +105,8 @@ npm install
 npm run check                                   # start the server like Claude Desktop and call status
 node scripts/try.mjs capture '{"page":"rental price calculator"}'   # call any tool; pictures go to build/try/
 node scripts/try-viewer.mjs images              # the in-chat viewer in a stand-in chat host (also: video, final)
-npm run build                                   # dist/marketing-studio-<version>.mcpb
+node scripts/try-music.mjs --levels             # a sample score to build/try-music/score.wav, and each instrument's level
+npm run build                                   # dist/marketing-studio-<version>.mcpb and the skill zip
 ```
 
 Set `MS_OUTPUT_DIR` to keep test work out of Documents, `MS_DEMO_PHONE`/`MS_DEMO_CODE` for logged-in tests, and
