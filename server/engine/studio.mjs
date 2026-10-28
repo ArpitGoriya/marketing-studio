@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from '../paths.mjs';
 import { getBrowser } from './browser.mjs';
+import { currentJob } from './jobs.mjs';
 import { KIT } from './music.mjs';
 
 const HOST = 'https://studio.local';
@@ -21,6 +22,7 @@ export async function withStudio(roots, fn, { onProgress } = {}) {
   const outputs = new Map();
   const b = await getBrowser();
   const context = await b.newContext({ viewport: { width: 400, height: 300 } });
+  currentJob()?.own(context);
   await context.route('**/*', async (route) => {
     const req = route.request();
     const u = new URL(req.url());

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { browserKind, getBrowser } from '../engine/browser.mjs';
+import { busyLine, runningJobs } from '../engine/jobs.mjs';
 import { sessionStatus } from '../engine/login.mjs';
 import { listProjects } from '../engine/project.mjs';
 import { withStudio } from '../engine/studio.mjs';
@@ -26,12 +27,20 @@ export function registerStatus(server) {
     async () => {
       ensureDirs();
       const lines = [`Marketing Studio ${VERSION} (Node ${process.versions.node}, ${os.platform()} ${os.arch()}).`];
+      const busy = runningJobs();
+      if (busy.length) lines.push(`Busy: ${busy.map(busyLine).join('; ')}. Call wait for it; if one stays on the same step for minutes, call reset.`);
       try {
-        await getBrowser();
-        const k = browserKind();
-        lines.push(`Browser: ready (${k === 'msedge' ? 'Microsoft Edge' : k === 'chrome' ? 'Google Chrome' : 'downloaded Chromium'}).`);
-        if (videoOk === null) videoOk = await withStudio([], (s) => s.canEncode()).catch(() => false);
-        lines.push(videoOk ? 'Video: ready (MP4 made by the browser).' : 'Video: this browser cannot make MP4 video. Install Google Chrome and restart Claude.');
+        // never let status itself hang on a stuck browser
+        await Promise.race([
+          (async () => {
+            await getBrowser();
+            const k = browserKind();
+            lines.push(`Browser: ready (${k === 'msedge' ? 'Microsoft Edge' : k === 'chrome' ? 'Google Chrome' : 'downloaded Chromium'}).`);
+            if (videoOk === null) videoOk = await withStudio([], (s) => s.canEncode()).catch(() => false);
+            lines.push(videoOk ? 'Video: ready (MP4 made by the browser).' : 'Video: this browser cannot make MP4 video. Install Google Chrome and restart Claude.');
+          })(),
+          new Promise((_, no) => setTimeout(() => no(new Error('it did not answer within 20 s; call reset')), 20000)),
+        ]);
       } catch (e) {
         lines.push(`Browser: not ready (${e.message}).`);
       }

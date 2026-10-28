@@ -94,3 +94,12 @@ export async function headedPersistent(profileDir, opts = {}) {
 
 export const browserKind = () => how;
 export const closeBrowser = () => shared?.close().catch(() => {});
+
+// reset: let go of the browser (even a stuck one: it gets 5 s to close) so the next call starts a fresh one
+export async function resetBrowser() {
+  const b = shared;
+  shared = null;
+  launching = null;
+  if (b) await Promise.race([b.close().catch(() => {}), new Promise((r) => setTimeout(r, 5000))]);
+  return !!b;
+}

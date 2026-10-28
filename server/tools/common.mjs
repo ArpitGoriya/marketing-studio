@@ -9,6 +9,9 @@ export const target = z.union([
     text: z.string().optional(),
     near: z.enum(['top', 'bottom']).optional(),
     label: z.string().optional(),
+    href: z.string().optional().describe('a link by its address, e.g. "/vendors"'),
+    x: z.number().optional().describe('a point on the screen in CSS px (with y), e.g. from read_page or a numbered capture'),
+    y: z.number().optional(),
     css: z.string().optional(),
   }),
 ]);
@@ -16,7 +19,7 @@ export const target = z.union([
 export const step = z
   .record(z.any())
   .describe(
-    "One action, e.g. {\"scroll_to\": \"Calculate\"}, {\"scroll\": 600}, {\"scroll\": \"bottom\", \"seconds\": 3}, {\"tap\": \"Calculate\"}, {\"tap\": {\"text\": \"Categories\", \"near\": \"bottom\"}}, {\"fill\": {\"field\": \"Search\", \"value\": \"lehenga\"}}, {\"set\": {\"field\": \"Purchase Price (MRP)\", \"value\": 50000}} (sliders and number fields), {\"press\": \"Enter\"}, {\"wait\": 1}, {\"wait_for\": {\"text\": \"Result\"}}, {\"mark\": \"result-shown\"}",
+    'One action, e.g. {"scroll_to": "Calculate"}, {"scroll": 600}, {"scroll": "bottom", "seconds": 3}, {"tap": "Calculate"}, {"tap": {"text": "Categories", "near": "bottom"}}, {"tap": {"href": "/vendors"}} (a link, also a picture or icon link), {"tap": {"x": 317, "y": 30}} (a point on the screen), {"fill": {"field": "Search", "value": "lehenga"}} (typed key by key), {"set": {"field": "Purchase Price (MRP)", "value": 50000}} (sliders and number fields), {"press": "Enter"}, {"wait": 1}, {"wait_for": {"text": "Result"}}, {"wait_for": {"url": "/vendors", "max": 5}} (fails fast if the page doesn\'t go there), {"mark": "result-shown"}. Each tap reports what it did (went to a page, or nothing changed).',
   );
 
 export const common = {
@@ -33,10 +36,12 @@ export const common = {
     .describe('phone: keep the empty bands a real phone leaves for its notch (top, 59 px) and home bar (bottom, 34 px). Only when your phone frame draws a notch or status bar over the screen. Default: the screen runs edge to edge, no empty bands.'),
 };
 
+// a plain answer for what went wrong; a failed step also brings a picture of the screen at that moment
 export const fail = (e) => {
   const known = e instanceof CaptureStop || e instanceof LoginStop;
   if (!known) console.error('[marketing-studio]', e);
-  return { content: [{ type: 'text', text: known ? e.message : `Something went wrong: ${String(e?.message ?? e).split('\n')[0]}` }], isError: true };
+  const words = known ? e.message : `Something went wrong: ${String(e?.message ?? e).split('\n')[0]}`;
+  return { content: [{ type: 'text', text: words }, ...(e?.shot ? [{ type: 'image', data: e.shot.toString('base64'), mimeType: 'image/jpeg' }] : [])], isError: true };
 };
 
 export const text = (t) => ({ type: 'text', text: t });

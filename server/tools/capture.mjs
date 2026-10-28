@@ -7,6 +7,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { getBrowser } from '../engine/browser.mjs';
 import { imageItem, shrink } from '../engine/imaging.mjs';
+import { jobAnswer, quickJob } from '../engine/jobs.mjs';
 import { locate } from '../engine/locate.mjs';
 import { keepSession } from '../engine/login.mjs';
 import { freeName, openProject } from '../engine/project.mjs';
@@ -21,6 +22,7 @@ const shotShape = z.object({
   crop: target.optional(),
   find: z.array(target).optional(),
   full_page: z.boolean().optional(),
+  numbers: z.boolean().optional(),
 });
 
 // one screenshot of the page as it is now; returns what was saved and shown
@@ -74,7 +76,15 @@ async function shoot(page, shot, { quality, scale, p, url, site, device, loggedI
   const file = p.file('captures', quality === 'high' ? `${name}.png` : `${name}.preview.jpg`);
   fs.writeFileSync(file, buf);
   // previews are for looking, so they come back at a readable size; a high-quality shot only needs a small check
-  const shown = await shrink(buf, { mime: quality === 'high' ? 'image/png' : 'image/jpeg', max: quality === 'high' ? 520 : 1100, quality: quality === 'high' ? 60 : 70 });
+  let shown = await shrink(buf, { mime: quality === 'high' ? 'image/png' : 'image/jpeg', max: quality === 'high' ? 520 : 1100, quality: quality === 'high' ? 60 : 70 });
+  // numbers: the picture Claude gets has every tappable thing numbered (the saved capture stays clean)
+  let numbered = null;
+  if (shot.numbers && !shot.full_page && !clip) {
+    numbered = await page.evaluate(NUMBER_TAPS);
+    const marked = await page.screenshot({ type: 'jpeg', quality: 70, scale: 'css', animations: 'disabled', caret: 'hide' });
+    await page.evaluate(() => document.getElementById('__ms_numbers')?.remove());
+    shown = { buf: marked };
+  }
   const width = Math.round((clip?.width ?? (await page.evaluate(() => document.documentElement.clientWidth))) * scale);
   const prev = p.data.captures[name];
   p.data.captures[name] = {
@@ -95,6 +105,13 @@ async function shoot(page, shot, { quality, scale, p, url, site, device, loggedI
   const line = [
     `${quality === 'high' ? 'High-quality' : 'Preview'} capture:${name}, ${width} px wide${quality === 'high' ? ' (saved full size; the picture here is a small check)' : ' (preview size; take it in "high" before the final export)'}.`,
     ...(found.length ? [`  Positions on the ${quality === 'high' ? 'full-size' : 'preview'} picture (px): ${found.map((f) => (f.found === false ? `${JSON.stringify(f.target)} not found` : `${JSON.stringify(f.target)} at x ${f.x}, y ${f.y}, ${f.width}x${f.height}`)).join('; ')}`] : []),
+    ...(numbered
+      ? [
+          `  Numbered on the picture (tap one by its point, e.g. {"tap": {"x": ${numbered[0]?.x ?? 0}, "y": ${numbered[0]?.y ?? 0}}}, or by its link): ${numbered
+            .map((t) => `${t.n} ${t.text ? `"${t.text}"` : `[picture ${t.kind}${t.pic ? ` "${t.pic}"` : ''}]`}${t.href ? ` -> ${t.href}` : ''} (${t.x}, ${t.y})`)
+            .join('; ')}`,
+        ]
+      : []),
   ].join('\n');
   return { line, image: imageItem(shown.buf) };
 }
@@ -116,39 +133,91 @@ export function registerCapture(server) {
         find: z.array(target).optional().describe('Things whose position on the picture you want, for zooms and callouts.'),
         shots: z.array(shotShape).max(8).optional().describe('Several screenshots of this page in one go. They run in order on the same page, so each starts where the last left it (add {"scroll":"top"} to go back). E.g. [{"name":"top"}, {"name":"result","steps":[{"scroll_to":"Suggested Rent"}],"crop":{"css":".result"}}].'),
         redact: z.boolean().optional().describe('Hide phone numbers and email addresses (on by default for logged-in pages).'),
+        numbers: z.boolean().optional().describe('Number every tappable thing on the screen (on the picture you get; the saved capture stays clean), with its position: for icons and picture buttons with no text.'),
       },
     },
     async (a) => {
-      let context;
       try {
-        const { site, url } = resolvePage(a.site, a.page);
-        if (a.logged_in && site.adhoc) throw new CaptureStop(`${site.name} isn't set up in Marketing Studio, so only its public pages can be captured (logged_in needs a set-up site).`);
-        const device = a.device ?? 'phone';
-        const quality = a.quality ?? 'preview';
-        const b = await getBrowser();
-        const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in, notch: !!a.notch });
-        context = made.context;
-        const scale = made.dev.scale[quality];
-        if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
-        const shots = a.shots?.length ? a.shots : [{ name: a.name, crop: a.crop, find: a.find, full_page: a.full_page }];
-        const page = await openPage(context, site, url, { warm: shots.some((s) => s.full_page), loggedIn: !!a.logged_in });
-        await runLive(page, site, a.steps ?? [], { touch: device === 'phone' });
-        const p = openProject(a.project);
-        const results = [];
-        for (const shot of shots) {
-          await runLive(page, site, shot.steps ?? [], { touch: device === 'phone' });
-          results.push(await shoot(page, shot, { quality, scale, p, url, site, device, loggedIn: !!a.logged_in, notch: !!a.notch, baseSteps: a.steps ?? [], fallbackName: a.name ?? a.page }));
-        }
-        assertNoWrites(made.traffic);
-        if (a.logged_in) await keepSession(page, site);
-        p.save();
-        const head = `${shots.length} ${quality} capture(s) of ${url} (${device}${a.logged_in ? ', logged in' : ''}${site.adhoc ? ', a site that is not set up' : ''}), saved in project "${p.data.title}".`;
-        return { content: [text([head, ...results.map((r) => r.line), trafficLine(made.traffic)].join('\n')), ...results.map((r) => r.image)] };
+        // a job like every slow tool, so the call answers within ~25 s even if a page is slow
+        return jobAnswer(await quickJob('capture', (update, job) => doCapture(a, update, job), { limit: 240, label: 'capture' }), fail);
       } catch (e) {
         return fail(e);
-      } finally {
-        await context?.close().catch(() => {});
       }
     },
   );
 }
+
+async function doCapture(a, update, job) {
+  let context;
+  try {
+    const { site, url } = resolvePage(a.site, a.page);
+    if (a.logged_in && site.adhoc) throw new CaptureStop(`${site.name} isn't set up in Marketing Studio, so only its public pages can be captured (logged_in needs a set-up site).`);
+    const device = a.device ?? 'phone';
+    const quality = a.quality ?? 'preview';
+    const b = await getBrowser();
+    const made = await siteContext(b, site, { device, quality, loggedIn: !!a.logged_in, notch: !!a.notch });
+    context = job.own(made.context);
+    const scale = made.dev.scale[quality];
+    if (a.redact ?? (a.logged_in && site.redact_when_logged_in)) await context.addInitScript(REDACT);
+    const shots = a.shots?.length ? a.shots : [{ name: a.name, crop: a.crop, find: a.find, full_page: a.full_page, numbers: a.numbers }];
+    update(0.1, 'opening the page');
+    const page = await openPage(context, site, url, { warm: shots.some((s) => s.full_page), loggedIn: !!a.logged_in });
+    const touch = device === 'phone';
+    const onStep = (m) => update(undefined, m);
+    const notes = await runLive(page, site, a.steps ?? [], { touch, onStep });
+    const p = openProject(a.project);
+    const results = [];
+    for (const [i, shot] of shots.entries()) {
+      notes.push(...(await runLive(page, site, shot.steps ?? [], { touch, onStep })));
+      update(0.3 + (0.6 * i) / shots.length, `taking shot ${i + 1} of ${shots.length}`);
+      results.push(await shoot(page, shot, { quality, scale, p, url, site, device, loggedIn: !!a.logged_in, notch: !!a.notch, baseSteps: a.steps ?? [], fallbackName: a.name ?? a.page }));
+    }
+    assertNoWrites(made.traffic);
+    if (a.logged_in) await keepSession(page, site);
+    p.save();
+    const head = `${shots.length} ${quality} capture(s) of ${url} (${device}${a.logged_in ? ', logged in' : ''}${site.adhoc ? ', a site that is not set up' : ''}), saved in project "${p.data.title}".`;
+    return { content: [text([head, ...(notes.length ? [`Steps: ${notes.join('; ')}.`] : []), ...results.map((r) => r.line), trafficLine(made.traffic)].join('\n')), ...results.map((r) => r.image)] };
+  } finally {
+    await context?.close().catch(() => {});
+  }
+}
+
+// numbers: every tappable thing on the screen gets a red number on the picture, and the list says what each is and
+// where to tap it (for icons and pictures with no text, like a logo button)
+const NUMBER_TAPS = () => {
+  const vis = (e) => {
+    const r = e.getBoundingClientRect();
+    const s = getComputedStyle(e);
+    return r.width > 4 && r.height > 4 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth && s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0.05;
+  };
+  const els = [...document.querySelectorAll('a[href],button,[role="button"],[role="tab"],input:not([type=hidden]),select,textarea')].filter(vis);
+  const outer = els.filter((e) => !els.some((o) => o !== e && o.contains(e))).slice(0, 40);
+  const layer = document.createElement('div');
+  layer.id = '__ms_numbers';
+  layer.style.cssText = 'position:fixed;inset:0;z-index:2147483646;pointer-events:none';
+  const list = outer.map((e, i) => {
+    const r = e.getBoundingClientRect();
+    const ring = document.createElement('div');
+    ring.style.cssText = `position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;outline:1.5px solid rgba(225,17,17,.7)`;
+    const tag = document.createElement('div');
+    tag.textContent = String(i + 1);
+    tag.style.cssText = `position:absolute;left:${Math.max(0, r.left)}px;top:${Math.max(0, r.top)}px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#e11;color:#fff;font:700 11px/16px Arial,sans-serif;text-align:center;box-shadow:0 0 0 1.5px #fff`;
+    layer.append(ring, tag);
+    const text = (e.innerText || e.getAttribute('aria-label') || e.getAttribute('title') || e.getAttribute('placeholder') || e.querySelector('img[alt]')?.alt || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    const kind = e.tagName === 'A' ? 'link' : /INPUT|SELECT|TEXTAREA/.test(e.tagName) ? 'field' : 'button';
+    // no text: the picture's file name (an image, or a CSS mask/background such as vendors.svg)
+    let pic = '';
+    if (!text)
+      for (const x of [e, ...e.querySelectorAll('*')].slice(0, 30)) {
+        const s = getComputedStyle(x);
+        const u = x.tagName === 'IMG' ? x.getAttribute('src') : (String(s.maskImage || s.webkitMaskImage || '').match(/url\(["']?([^"')]+)/) || String(s.backgroundImage || '').match(/url\(["']?([^"')]+)/))?.[1];
+        if (u) {
+          pic = u.split(/[?#]/)[0].split('/').pop().replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ');
+          break;
+        }
+      }
+    return { n: i + 1, text, pic, kind, href: e.closest('a[href]')?.getAttribute('href') ?? null, x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+  });
+  document.documentElement.appendChild(layer);
+  return list;
+};

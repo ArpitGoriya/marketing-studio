@@ -27,7 +27,8 @@ export function registerFindPage(server) {
         const site = getSite(siteId);
         const named = Object.entries(site.pages ?? {}).map(([k, v]) => ({ url: new URL(v, site.url).href, group: 'named', text: k }));
         const pub = await publicPages(site, { refresh });
-        const acct = logged_in || sessionStatus(site).signedIn ? await accountPages(site, { refresh }) : [];
+        // the account menu needs the browser: given 30 s at most, so a slow sign-in never holds up the search
+        const acct = logged_in || sessionStatus(site).signedIn ? await Promise.race([accountPages(site, { refresh }), new Promise((r) => setTimeout(() => r([]), 30000))]) : [];
         // one entry per page: /user/wishlist and /user/wishlist/ are the same (named pages win)
         const seen = new Set();
         const all = [...named, ...acct, ...pub].filter((p) => {

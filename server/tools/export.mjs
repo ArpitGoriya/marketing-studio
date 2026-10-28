@@ -268,7 +268,7 @@ const designShape = {
 };
 
 const REFS =
-  'In your HTML use capture:<name> for screenshots, <img src="clip:<name>" data-start="<seconds>"> for recordings (they play in step with the video), brand:<logo or pattern> (e.g. brand:wordmark?color=red) and inbox:<file> for supplied images. The brand fonts are loaded already (use them by name, e.g. font-family: Inter). Nothing loads from the internet. ';
+  'In your HTML use capture:<name> for screenshots, <img src="clip:<name>" data-start="<seconds>"> for recordings (they play in step with the video; data-from / data-to play only part of one, so one recording makes several scenes), brand:<logo or pattern> (e.g. brand:wordmark?color=red) and inbox:<file> for supplied images. The brand fonts are loaded already (use them by name, e.g. font-family: Inter). Nothing loads from the internet. ';
 
 export function registerExport(server) {
   server.registerTool(
@@ -285,7 +285,7 @@ export function registerExport(server) {
     async (a) => {
       try {
         const brand = getBrand(a.brand);
-        const job = startJob('check', (update) => doCheck(a, brand, update));
+        const job = startJob('check', (update) => doCheck(a, brand, update), { limit: 300, label: 'check' });
         await waitJob(job, JOB_WAIT);
         return jobAnswer(job, fail);
       } catch (e) {
@@ -323,7 +323,7 @@ export function registerExport(server) {
       try {
         const brand = getBrand(a.brand);
         const opts = { ...a, viewer: showsViewer(server) };
-        const job = startJob(a.kind === 'video' ? 'video' : 'images', (update) => (a.kind === 'video' ? doVideo(opts, brand, update) : doImages(opts, brand, update)));
+        const job = startJob(a.kind === 'video' ? 'video' : 'images', (update) => (a.kind === 'video' ? doVideo(opts, brand, update) : doImages(opts, brand, update)), { limit: a.kind === 'video' ? 1800 : 300, label: a.kind === 'video' ? 'video export' : 'slides export' });
         // what the viewer says while it waits ("Making your video", the right shape)
         let size = {};
         try {
@@ -348,7 +348,7 @@ export function registerExport(server) {
       const html = path.join(p.dir, 'exports', name, 'source', 'video.html');
       if (e?.kind !== 'video' || !e.settings || !fs.existsSync(html)) throw new CaptureStop('This preview was made by an older version, so ask Claude in the chat for the final video.');
       const brand = getBrand(e.settings.brand);
-      const job = startJob('video', (update) => doVideo({ ...e.settings, project: p.data.title, name, kind: 'video', html: fs.readFileSync(html, 'utf8'), quality: 'final', viewer: true, open: false }, brand, update));
+      const job = startJob('video', (update) => doVideo({ ...e.settings, project: p.data.title, name, kind: 'video', html: fs.readFileSync(html, 'utf8'), quality: 'final', viewer: true, open: false }, brand, update), { limit: 1800, label: 'HD version' });
       job.info = { kind: 'video', name, width: e.width, height: e.height };
       return { content: [text(`Making the final video (job "${job.id}").`)], structuredContent: { job: job.id } };
     } catch (err) {

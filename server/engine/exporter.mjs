@@ -14,6 +14,7 @@ import path from 'node:path';
 import { brands, INBOX } from '../paths.mjs';
 import { getBrowser } from './browser.mjs';
 import { LINT_SOURCE } from './checks.mjs';
+import { currentJob } from './jobs.mjs';
 import { CaptureStop } from './site.mjs';
 
 const HOST = 'https://studio.local';
@@ -77,7 +78,7 @@ function wrap(fragment, { width, height, brand, video }) {
   return `<!doctype html><html><head>${head}</head><body>${fragment}</body></html>`;
 }
 
-// plays clip:<name> images in step with the page clock: frame = (time - data-start) * speed * fps
+// plays clip:<name> images in step with the page clock: frame = (data-from + (time - data-start) * speed) * fps, up to data-to
 const CLIP_PLAYER = `
 window.ms = window.ms || {};
 (() => {
@@ -92,8 +93,12 @@ window.ms = window.ms || {};
       if (!m) continue;
       const info = ms.clips[m[1]];
       if (!info) continue;
+      // data-from / data-to: play only that part of the recording (seconds into it), so one take makes several scenes
       const t = ms.time() - Number(img.dataset.start || 0);
-      const i = Math.max(0, Math.min(info.count - 1, Math.floor(t * Number(img.dataset.speed || 1) * info.fps)));
+      const from = Number(img.dataset.from || 0);
+      const to = img.dataset.to != null ? Number(img.dataset.to) : Infinity;
+      const at = Math.min(to, from + Math.max(0, t) * Number(img.dataset.speed || 1));
+      const i = Math.max(0, Math.min(info.count - 1, Math.floor(at * info.fps)));
       const want = '${HOST}/clip/' + m[1] + '/' + String(i).padStart(4, '0') + '.jpg';
       if (img.src !== want) { img.src = want; loads.push(img.decode().catch(() => {})); }
     }
@@ -108,6 +113,7 @@ const noop = () => {};
 async function exportContext({ project, brand, pages, width, height, scale, video }) {
   const b = await getBrowser();
   const context = await b.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
+  currentJob()?.own(context);
   const blocked = new Set();
   const clipInfo = {};
   for (const [name, c] of Object.entries(project.data.clips)) {

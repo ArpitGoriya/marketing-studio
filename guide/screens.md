@@ -5,7 +5,17 @@
 - Plan from the agreed storyboard: which screen, which state, which action. Use read_page to look around, not
   screenshots. If you can't tell which screen or flow the person means, ask.
 - **For a video of how something works, record it** (record tool): the steps as the user does them, in order.
-  Taps are filmed as a soft fingertip; the answer gives when and where each tap happened.
+  Taps are filmed as a soft fingertip; the answer gives when and where each tap happened, and what it did.
+- **Dry run first** (`dry_run: true`, a few seconds, nothing filmed): every step runs for real and reports what it
+  did ("went to /vendors", "nothing changed", "the field shows ..."). Fix every step that fails before filming.
+- **Tapping things without text**: a picture or icon button by its picture's name ("vendors"), by its link
+  (`{"href": "/vendors"}`), or by its point (`{"x": 320, "y": 36}`). read_page lists picture buttons with their
+  points; `capture` with `numbers: true` shows every tappable thing numbered.
+- **A tap that changes nothing** usually means the thing isn't a link on the site (only the picture is, not the name
+  under it), or something lies over it. Try the part that is the link; if nothing works, tell the person: it may be a
+  real problem on the site.
+- **One recording, several scenes**: `<img src="clip:flow" data-start="4" data-from="6.5" data-to="10">` plays
+  seconds 6.5-10 of the recording from 4 s in the video.
 - **For a carousel or a still, capture** the screen in the state you need. Use `crop` for one card or section, and
   `find` for positions you want to point at.
 - Phone screens run **edge to edge**: no empty band at the top or bottom. Use `notch: true` only when your phone

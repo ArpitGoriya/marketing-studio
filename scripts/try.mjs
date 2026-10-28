@@ -26,7 +26,7 @@ for (let i = 0; i < calls.length; i += 2) {
     const m = r.content.map((c) => c.text ?? '').join(' ').match(/wait tool with job "([^"]+)"/);
     if (!m) break;
     process.stdout.write(`  … ${r.content[0].text.split('(')[1]?.split(')')[0] ?? 'working'}\n`);
-    r = await client.callTool({ name: 'wait', arguments: { job: m[1], seconds: 40 } }, undefined, { timeout: 600000 });
+    r = await client.callTool({ name: 'wait', arguments: { job: m[1], seconds: 25 } }, undefined, { timeout: 600000 });
   }
   console.log(`\n=== ${tool} ${r.isError ? '(ERROR) ' : ''}in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
   r.content.forEach((c, j) => {

@@ -38,6 +38,7 @@ const sb = async (site, route, body) => {
     method: 'POST',
     headers: { apikey: l.anon_key, Authorization: `Bearer ${l.anon_key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(20000),
   }).catch((e) => ({ ok: false, status: 0, json: async () => ({ msg: e.message }) }));
   const j = await res.json().catch(() => ({}));
   if (!res.ok || !j.access_token) throw new LoginStop(j.msg || j.error_description || j.message || `sign-in answered ${res.status}`);

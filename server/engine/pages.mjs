@@ -19,7 +19,7 @@ export async function publicPages(site, { refresh = false } = {}) {
   if (!refresh && fresh(f)) return readJson(f, []);
   const index = new URL(site.sitemap ?? '/sitemap.xml', site.url).href;
   const get = async (u) => {
-    const r = await fetch(u, { headers: { 'x-marketing-studio': '1' } }).catch(() => null);
+    const r = await fetch(u, { headers: { 'x-marketing-studio': '1' }, signal: AbortSignal.timeout(15000) }).catch(() => null);
     return r?.ok ? r.text() : '';
   };
   const top = await get(index);

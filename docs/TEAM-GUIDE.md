@@ -74,6 +74,8 @@ Everything is also saved in **Documents → Marketing Studio → (your project n
 ## Good to know
 
 - Videos take a minute or two. Claude says "still working" and carries on by itself.
+- If it seems stuck for several minutes, type *reset Marketing Studio*: it stops what's running and starts fresh,
+  without losing anything saved.
 - It never changes anything on the site or app: it only looks, scrolls and fills in things like the calculator.
 - Pages behind the login show the demo account, never real customers.
 - Something odd? Tell Claude *it's not working*, or message the owner.
