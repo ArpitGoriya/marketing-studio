@@ -65,7 +65,8 @@ const HOST = `<!doctype html><html><body style="margin:0;background:#faf9f5;font
     window.seen.push(m.method ?? 'answer');
     if (m.method === 'ui/notifications/size-changed') return void (f.style.height = Math.ceil(m.params.height) + 'px');
     if (m.method === 'ui/notifications/initialized') {
-      send({ jsonrpc: '2.0', method: 'ui/notifications/tool-input', params: { arguments: window.TOOL_ARGS } });
+      // MS_NO_INPUT=1: like a chat app that sends the result without the tool's arguments first
+      if (window.TOOL_ARGS) send({ jsonrpc: '2.0', method: 'ui/notifications/tool-input', params: { arguments: window.TOOL_ARGS } });
       send({ jsonrpc: '2.0', method: 'ui/notifications/tool-result', params: window.TOOL_RESULT });
       return;
     }
@@ -97,10 +98,10 @@ page.on('pageerror', (e) => problems.push(e.message));
 await page.exposeFunction('mcp', (method, params) => (method === 'tools/call' ? client.callTool(params, undefined, { timeout: 600000 }) : client.readResource(params)));
 await page.setContent(HOST);
 await page.evaluate(({ doc, args, result }) => {
-  window.TOOL_ARGS = args;
+  window.TOOL_ARGS = args; // null with MS_NO_INPUT=1
   window.TOOL_RESULT = result;
   document.getElementById('v').srcdoc = doc;
-}, { doc, args, result });
+}, { doc, args: process.env.MS_NO_INPUT ? null : args, result });
 await page.waitForTimeout(500);
 const view = page.frames().find((f) => f !== page.mainFrame());
 const status = () => view.locator('#status').textContent();

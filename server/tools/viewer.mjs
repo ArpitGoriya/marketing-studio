@@ -114,7 +114,8 @@ export function registerViewer(server) {
     const j = getJob(job);
     if (!j) return answer({ state: 'gone' }, 'That job is no longer running.');
     const error = j.state === 'failed' ? String(j.error?.message ?? j.error) : null;
-    return answer({ state: j.state, progress: j.progress, message: j.message, view: j.result?._meta?.[VIEW_KEY] ?? null, error }, j.state);
+    const info = j.info ?? { kind: j.kind === 'video' ? 'video' : j.kind === 'images' ? 'images' : undefined };
+    return answer({ state: j.state, progress: j.progress, message: j.message, info, view: j.result?._meta?.[VIEW_KEY] ?? null, error }, j.state);
   });
 
   registerAppTool(server, 'viewer_latest', { description: "For the viewer: a project's export to show.", inputSchema: { project: z.string(), name: z.string().optional() }, _meta: appOnly }, async (a) => {

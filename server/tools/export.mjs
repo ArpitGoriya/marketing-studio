@@ -324,9 +324,16 @@ export function registerExport(server) {
         const brand = getBrand(a.brand);
         const opts = { ...a, viewer: showsViewer(server) };
         const job = startJob(a.kind === 'video' ? 'video' : 'images', (update) => (a.kind === 'video' ? doVideo(opts, brand, update) : doImages(opts, brand, update)));
+        // what the viewer says while it waits ("Making your video", the right shape)
+        let size = {};
+        try {
+          const [width, height] = sizeOf(brand, a);
+          size = { width, height };
+        } catch {}
+        job.info = { kind: a.kind, name: a.name, ...(a.kind === 'images' ? { count: a.pages?.length ?? 0 } : {}), ...size };
         await waitJob(job, JOB_WAIT);
         const r = jobAnswer(job, fail);
-        return job.state === 'running' ? { ...r, _meta: { [VIEW_KEY]: { job: job.id, project: a.project, name: a.name, kind: a.kind } } } : r;
+        return job.state === 'running' ? { ...r, _meta: { [VIEW_KEY]: { job: job.id, project: a.project, ...job.info } } } : r;
       } catch (e) {
         return fail(e);
       }
@@ -342,6 +349,7 @@ export function registerExport(server) {
       if (e?.kind !== 'video' || !e.settings || !fs.existsSync(html)) throw new CaptureStop('This preview was made by an older version, so ask Claude in the chat for the final video.');
       const brand = getBrand(e.settings.brand);
       const job = startJob('video', (update) => doVideo({ ...e.settings, project: p.data.title, name, kind: 'video', html: fs.readFileSync(html, 'utf8'), quality: 'final', viewer: true, open: false }, brand, update));
+      job.info = { kind: 'video', name, width: e.width, height: e.height };
       return { content: [text(`Making the final video (job "${job.id}").`)], structuredContent: { job: job.id } };
     } catch (err) {
       return fail(err);

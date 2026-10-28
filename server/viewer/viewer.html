@@ -100,7 +100,7 @@
   const KEY = 'marketing-studio/view';
   const { App, applyDocumentTheme, applyHostStyleVariables, applyHostFonts } = window.McpExtApps;
   const $ = (id) => document.getElementById(id);
-  const app = new App({ name: 'Marketing Studio viewer', version: '1.2.1' }, { availableDisplayModes: ['inline', 'fullscreen'] });
+  const app = new App({ name: 'Marketing Studio viewer', version: '1.2.2' }, { availableDisplayModes: ['inline', 'fullscreen'] });
 
   let input = {}; // the tool call's arguments: project, name, kind, size
   let view = null; // the export being shown
@@ -180,8 +180,23 @@
     if (/square|1.?1/i.test(input.size ?? '')) return 1;
     return 4 / 5;
   }
+  // what's being made, from the job or the tool's arguments; neutral words until it's known
+  const making = () =>
+    input.kind === 'video' ? 'Making your video' : input.kind === 'images' ? ((input.count ?? input.pages?.length) === 1 ? 'Making your post' : 'Making your slides') : 'Making your design';
+  const learn = (info) => {
+    if (!info) return;
+    const { kind, width, height, size, name, pages, count } = info;
+    input = {
+      ...input,
+      ...(['images', 'video'].includes(kind) ? { kind } : {}),
+      ...(width && height ? { width, height } : {}),
+      ...(typeof size === 'string' ? { size } : {}),
+      ...(name ? { name } : {}),
+      ...(Array.isArray(pages) ? { count: pages.length } : typeof count === 'number' ? { count } : {}),
+    };
+  };
   function showWaiting(message, progress, title) {
-    $('title').textContent = title ?? (input.kind === 'video' ? 'Making your video' : 'Making your slides');
+    $('title').textContent = title ?? making();
     $('meta').textContent = progress == null ? '' : `${Math.round(progress * 100)}%`;
     $('bar').hidden = true;
     const st = $('stage');
@@ -209,6 +224,7 @@
     }
     if (d?.items || d?.video) return show(d);
     const job = d?.job ?? /job "([\w-]+)"/.exec(textOf(result))?.[1];
+    learn(d);
     if (job) return follow(job);
     return latest();
   }
@@ -220,6 +236,7 @@
       } catch (e) {
         return showProblem(e.message);
       }
+      learn(s.info);
       if (s.state === 'running') {
         showWaiting(s.message, s.progress, title);
         await sleep(1500);
@@ -451,7 +468,12 @@
 
   // ---- connect (handlers first, so the first notifications aren't missed)
   app.ontoolinput = ({ arguments: a }) => {
-    input = a ?? {};
+    input = { ...input, ...(a ?? {}) };
+    if (!view) showWaiting(null, null);
+  };
+  // the arguments as Claude is still writing them: enough to say "video" or "slides" early
+  app.ontoolinputpartial = ({ arguments: a }) => {
+    learn(a);
     if (!view) showWaiting(null, null);
   };
   app.ontoolresult = (r) => handle(r);
