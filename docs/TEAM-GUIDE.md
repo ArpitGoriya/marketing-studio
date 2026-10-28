@@ -26,9 +26,20 @@ Just say what you want, for example:
 Claude will:
 1. ask a few questions and suggest the idea;
 2. look at the app pages and show you quick screenshots;
-3. design it and show you the result;
-4. change anything you ask ("shorter headline on slide 2", "use the green outfit instead");
-5. save the final files and open the folder.
+3. design it and show you the result **right in the chat**: swipe through the slides, or play the video;
+4. change anything you ask ("shorter headline on slide 2", "use the green outfit instead"). Looking at a slide and
+   saying "make this one shorter" works too: Claude knows which slide you're on.
+
+The first time a result shows, Claude asks to display it: click **Always allow**.
+
+## Using a finished piece
+
+Under each result in the chat:
+- **Copy**: puts the slide (or video) on your clipboard. Paste it straight into WhatsApp, Canva or an email.
+- **Download** / **Download all**: saves the files where you choose.
+- **Show in folder**: opens the folder with the files.
+
+Want an earlier piece back? Ask *show me the calculator carousel again*.
 
 ## Showing Claude a page
 
@@ -42,8 +53,8 @@ WAV), paste the script into the chat, and say "done". Claude times the video to 
 
 ## Where are my files?
 
-In **Documents → Marketing Studio → (your project name)**:
-- `exports` has the finished images and videos, ready to post or send on WhatsApp;
+Everything is also saved in **Documents → Marketing Studio → (your project name)**:
+- `exports` has the finished images and videos;
 - `captures` and `clips` have the screenshots and recordings.
 
 ## Good to know

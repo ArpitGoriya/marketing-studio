@@ -2,6 +2,8 @@
 // a tool waits up to ~40 s for a job and answers with the result, or with "still working" and the job's id, and
 // Claude calls `wait` until it's done. (Claude Desktop may give up on a single tool call after about a minute.)
 const jobs = new Map();
+// how long a tool waits before answering "still working" (MS_JOB_WAIT shortens it for tests)
+export const JOB_WAIT = Number(process.env.MS_JOB_WAIT) || 40;
 let n = 0;
 
 export function startJob(kind, run) {

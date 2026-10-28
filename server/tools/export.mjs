@@ -1,19 +1,21 @@
 // export: turn Claude's own design into finished files. Claude writes the HTML/CSS (one page per slide, or one
 // animated page for a video) using capture:, clip:, brand: and inbox: references; this renders it with the real
 // screens and the brand fonts. Images: PNG per slide. Video: a fast preview first, then the final MP4, with the
-// voiceover and music mixed in.
+// voiceover and music mixed in. Where the chat app can, the result shows in the chat in the viewer (viewer.mjs).
 import fs from 'node:fs';
 import path from 'node:path';
+import { registerAppTool } from '@modelcontextprotocol/ext-apps/server';
 import { z } from 'zod';
 import { exportFrames, exportImages, getBrand, prepare } from '../engine/exporter.mjs';
 import { contactSheet, imageItem, shrink } from '../engine/imaging.mjs';
-import { jobAnswer, startJob, waitJob } from '../engine/jobs.mjs';
+import { jobAnswer, startJob, JOB_WAIT, waitJob } from '../engine/jobs.mjs';
 import { openFolder } from '../engine/open.mjs';
 import { openProject } from '../engine/project.mjs';
 import { CaptureStop } from '../engine/site.mjs';
 import { withStudio } from '../engine/studio.mjs';
 import { D, INBOX, slug } from '../paths.mjs';
 import { fail, text } from './common.mjs';
+import { showsViewer, VIEW_KEY, viewData, viewerUi } from './viewer.mjs';
 
 function sizeOf(brand, a) {
   if (a.width && a.height) return [a.width, a.height];
@@ -54,18 +56,27 @@ async function doImages(a, brand, update) {
   const { files, blocked } = await exportImages({ project: p, brand, pages, width, height, scale: a.scale ?? 1, outDir, onProgress: (f) => update(f * 0.9, 'rendering slides') });
   p.data.exports[name] = { kind: 'images', width, height, files: files.map((f) => path.relative(p.dir, f.file)), at: new Date().toISOString() };
   p.save();
+  // what Claude checks (small) and what the viewer in the chat shows (sharper, still light)
   const previews = [];
-  for (const f of files.slice(0, 10)) previews.push(imageItem((await shrink(f.buf, { max: 720, quality: 72 })).buf));
+  const views = [];
+  for (const [i, f] of files.entries()) {
+    if (i < 10) previews.push(imageItem((await shrink(f.buf, { max: 720, quality: 72 })).buf));
+    const v = path.join(outDir, 'source', `view-${String(i + 1).padStart(2, '0')}.jpg`);
+    fs.writeFileSync(v, (await shrink(f.buf, { max: 1080, quality: 85 })).buf);
+    views.push(path.relative(p.dir, v));
+  }
+  p.data.exports[name].views = views;
+  p.save();
   const warn = copyWarnings(brand, a.pages);
   const lines = [
     `Exported ${files.length} slide(s) "${name}" at ${width}x${height} px: ${outDir}`,
     ...(previewOnly.length ? [`Note: ${previewOnly.join(', ')} used preview-quality captures. For the final files, capture them again with quality "high" and export again.`] : []),
     ...(warn.length ? [`Brand copy check: ${warn.join('; ')}`] : []),
     ...(blocked.length ? [`Blocked from the internet (the design must use brand fonts and project files): ${blocked.join(', ')}`] : []),
-    a.open === false ? '' : 'The folder is open.',
+    a.viewer ? 'The slides are showing in the chat, where the person can swipe through them, copy or download them.' : a.open === false ? '' : 'The folder is open.',
   ].filter(Boolean);
-  if (a.open !== false) openFolder(outDir);
-  return { content: [text(lines.join('\n')), ...previews] };
+  if (a.open ?? !a.viewer) openFolder(outDir);
+  return { content: [text(lines.join('\n')), ...previews], _meta: { [VIEW_KEY]: viewData(p, name) } };
 }
 
 async function doVideo(a, brand, update) {
@@ -90,22 +101,29 @@ async function doVideo(a, brand, update) {
   const music = inboxFile(a.music);
   const out = path.join(outDir, `${name}${final ? '' : '.preview'}.mp4`);
   const roots = [framesDir, INBOX];
-  const stats = await withStudio(roots, (s) =>
-    s.encode({
+  const view = final ? path.join(outDir, 'source', 'view.mp4') : null;
+  const stats = await withStudio(roots, async (s) => {
+    const audio = voice || music ? { voice: voice && { file: voice, start: a.voiceover_start ?? 0 }, music: music && { file: music, start: a.music_start ?? 0, volume_db: a.music_volume_db ?? 0 }, target: -14 } : null;
+    const made = await s.encode({
       frames: files,
       fps,
       width: Math.round(width * scale),
       height: Math.round(height * scale),
       bitrate: final ? (width * height > 2e6 ? 12e6 : 8e6) : 2e6,
-      audio: voice || music ? { voice: voice && { file: voice, start: a.voiceover_start ?? 0 }, music: music && { file: music, start: a.music_start ?? 0, volume_db: a.music_volume_db ?? 0 }, target: -14 } : null,
+      audio,
       outFile: out,
-    }),
-  );
+    });
+    if (view) {
+      update(0.9, 'making a light copy for the chat');
+      await s.encode({ frames: files, fps, width: Math.round(width / 2), height: Math.round(height / 2), bitrate: 2.5e6, audio, outFile: view });
+    }
+    return made;
+  });
   update(0.95, 'making the contact sheet');
   const times = files.map((_, i) => `${(i / fps).toFixed(1)} s`);
   const sheet = await contactSheet(files, { title: `${name}: ${a.duration} s, ${stats.width}x${stats.height}, ${fps} fps${final ? '' : ' (preview)'}`, times, cell: width > height ? 220 : 150, cols: width > height ? 4 : 6 });
   fs.rmSync(framesDir, { recursive: true, force: true });
-  p.data.exports[name] = { ...(p.data.exports[name] ?? {}), kind: 'video', width, height, duration: a.duration, [final ? 'final' : 'preview']: path.relative(p.dir, out), at: new Date().toISOString() };
+  p.data.exports[name] = { ...(p.data.exports[name] ?? {}), kind: 'video', width, height, duration: a.duration, [final ? 'final' : 'preview']: path.relative(p.dir, out), latest: final ? 'final' : 'preview', ...(view ? { view_final: path.relative(p.dir, view) } : {}), at: new Date().toISOString() };
   p.save();
   const warn = copyWarnings(brand, [a.html]);
   const lines = [
@@ -116,13 +134,15 @@ async function doVideo(a, brand, update) {
     ...(warn.length ? [`Brand copy check: ${warn.join('; ')}`] : []),
     ...(blocked.length ? [`Blocked from the internet (the design must use brand fonts and project files): ${blocked.join(', ')}`] : []),
     'The picture shows 12 moments from it.',
+    ...(a.viewer ? ['The video is playing in the chat, where the person can watch, copy or download it.'] : []),
   ];
-  if (a.open !== false) openFolder(outDir);
-  return { content: [text(lines.join('\n')), imageItem(sheet)] };
+  if (a.open ?? !a.viewer) openFolder(outDir);
+  return { content: [text(lines.join('\n')), imageItem(sheet)], _meta: { [VIEW_KEY]: viewData(p, name) } };
 }
 
 export function registerExport(server) {
-  server.registerTool(
+  registerAppTool(
+    server,
     'export',
     {
       title: 'Export a design',
@@ -149,15 +169,18 @@ export function registerExport(server) {
         music_volume_db: z.number().optional().describe('music louder (+) or quieter (-) than normal, in dB.'),
         scale: z.number().min(1).max(3).optional().describe('images: pixel density (1 default; 2 for extra sharp).'),
         brand: z.string().optional(),
-        open: z.boolean().optional().describe('Open the folder afterwards (default yes).'),
+        open: z.boolean().optional().describe('Open the folder afterwards (default: only when the chat cannot show the result itself).'),
       },
+      _meta: viewerUi,
     },
     async (a) => {
       try {
         const brand = getBrand(a.brand);
-        const job = startJob(a.kind === 'video' ? 'video' : 'images', (update) => (a.kind === 'video' ? doVideo(a, brand, update) : doImages(a, brand, update)));
-        await waitJob(job, 40);
-        return jobAnswer(job, fail);
+        const opts = { ...a, viewer: showsViewer(server) };
+        const job = startJob(a.kind === 'video' ? 'video' : 'images', (update) => (a.kind === 'video' ? doVideo(opts, brand, update) : doImages(opts, brand, update)));
+        await waitJob(job, JOB_WAIT);
+        const r = jobAnswer(job, fail);
+        return job.state === 'running' ? { ...r, _meta: { [VIEW_KEY]: { job: job.id, project: a.project, name: a.name, kind: a.kind } } } : r;
       } catch (e) {
         return fail(e);
       }

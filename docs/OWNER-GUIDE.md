@@ -3,7 +3,7 @@
 ## What it is
 
 A Claude desktop extension (MCPB) that runs on each laptop. Claude designs the posts and videos itself; the
-extension gives it eleven tools:
+extension gives it twelve tools:
 
 | Tool | What it does |
 |---|---|
@@ -14,10 +14,17 @@ extension gives it eleven tools:
 | `capture` | Screenshots, preview first, then high quality; several shots of one page per call. A crop by text grows to the card around it, with fixed bars hidden. |
 | `record` | Frame-by-frame screen recordings. |
 | `inbox` | Supplied audio and images. |
-| `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed. |
+| `export` | Claude's HTML becomes PNG slides or an MP4 with the real screens and the sound mixed. The result shows in the chat (see below). |
+| `show` | Shows an earlier export in the chat again. |
 | `projects` | Earlier work. |
 | `sign_in` | Check or redo the sign-in. |
 | `wait` | Results of long jobs. |
+
+Results show **in the chat** in a viewer (an MCP App): slides to swipe through or the video playing, with Copy (to
+the clipboard, so it pastes into WhatsApp or Canva), Download and Show-in-folder buttons. It tells Claude which slide
+is on screen, so "make this one shorter" works. The viewer is part of the extension and loads nothing from the
+internet. Chat apps that can't show it get the old behaviour (pictures in the answer, the folder opens). The viewer
+uses a few tools of its own (`viewer_*`) that Claude doesn't see.
 
 Everything is made and saved on the laptop, with nothing hosted:
 - It uses the laptop's own **Chrome or Edge**; video is encoded by the browser, so there's nothing to download. A
@@ -79,11 +86,13 @@ Everything is made and saved on the laptop, with nothing hosted:
 npm install
 npm run check                                   # start the server like Claude Desktop and call status
 node scripts/try.mjs capture '{"page":"rental price calculator"}'   # call any tool; pictures go to build/try/
+node scripts/try-viewer.mjs images              # the in-chat viewer in a stand-in chat host (also: video, final)
 npm run build                                   # dist/marketing-studio-<version>.mcpb
 ```
 
 Set `MS_OUTPUT_DIR` to keep test work out of Documents, `MS_DEMO_PHONE`/`MS_DEMO_CODE` for logged-in tests, and
-`MS_NO_OPEN=1` to stop folders opening.
+`MS_NO_OPEN=1` to stop folders opening. `MS_JOB_WAIT=1` makes long jobs answer "still working" at once, to test
+that path.
 
 ## Known limits
 

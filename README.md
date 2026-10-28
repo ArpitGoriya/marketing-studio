@@ -8,7 +8,8 @@ this extension is its camera and export button:
   low-quality look comes first, then high quality. Nothing on the site is ever changed.
 - **inbox**: voiceovers and music people supply, with their length and spoken parts for timing.
 - **export**: Claude's own HTML designs become finished PNG slides and MP4 videos, with the real screens, the brand
-  fonts and the mixed sound.
+  fonts and the mixed sound. They show right in the chat (swipe through slides, play the video) with Copy,
+  Download and Show-in-folder buttons.
 
 Everything runs and is saved on each laptop (`Documents/Marketing Studio/`), using its own Chrome or Edge. It works
 with any brand or site: a site profile (`sites/`) says how to reach and sign in to a site, and a brand pack

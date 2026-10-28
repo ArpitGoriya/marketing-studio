@@ -18,6 +18,7 @@ import { registerReadPage } from './tools/read_page.mjs';
 import { registerRecord } from './tools/record.mjs';
 import { registerSignIn } from './tools/sign_in.mjs';
 import { registerStatus } from './tools/status.mjs';
+import { registerViewer, showsViewer } from './tools/viewer.mjs';
 import { registerWait } from './tools/wait.mjs';
 
 const server = new McpServer({ name: 'marketing-studio', title: 'Marketing Studio', version: VERSION }, { instructions: INSTRUCTIONS });
@@ -31,6 +32,7 @@ registerSignIn(server);
 registerBrand(server);
 registerInbox(server);
 registerExport(server);
+registerViewer(server);
 registerProjects(server);
 
 process.on('uncaughtException', (e) => console.error('[marketing-studio]', e));
@@ -42,3 +44,4 @@ process.stdin.on('end', stop);
 process.on('SIGTERM', stop);
 await server.connect(new StdioServerTransport());
 console.error(`[marketing-studio] ${VERSION} ready`);
+server.server.oninitialized = () => console.error(`[marketing-studio] chat app: ${JSON.stringify(server.server.getClientVersion())}, shows the viewer: ${showsViewer(server)}`);

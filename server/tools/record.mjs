@@ -5,7 +5,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { getBrowser } from '../engine/browser.mjs';
 import { contactSheet, imageItem } from '../engine/imaging.mjs';
-import { jobAnswer, startJob, waitJob } from '../engine/jobs.mjs';
+import { jobAnswer, startJob, JOB_WAIT, waitJob } from '../engine/jobs.mjs';
 import { keepSession } from '../engine/login.mjs';
 import { freeName, openProject } from '../engine/project.mjs';
 import { Recorder } from '../engine/recorder.mjs';
@@ -126,7 +126,7 @@ export function registerRecord(server) {
     },
     async (a) => {
       const job = startJob('record', (update) => doRecord(a, update));
-      await waitJob(job, 40);
+      await waitJob(job, JOB_WAIT);
       return jobAnswer(job, fail);
     },
   );

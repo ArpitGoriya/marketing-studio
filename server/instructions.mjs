@@ -35,7 +35,10 @@ Working rhythm:
    - video as a "preview" first, then "final" once they're happy;
    - add their voiceover or music from the Inbox (inbox tool: open it so they can drop files in; "info" gives the
      spoken parts to time scenes to each line of the script).
-   Show the result, revise on feedback, export again (reuse the captures; recapture only if the screen must change).
+   The result shows in the chat in a viewer (slides to swipe through, or the video playing) with Copy, Download and
+   Show-in-folder buttons, so don't send the person to a folder to look. show brings back an earlier export.
+   Revise on feedback and export again (reuse the captures; recapture only if the screen must change). When the
+   person says "this slide", the viewer tells you which slide they are looking at.
 8. Long jobs answer "still working" with a job id: call wait until it's done (tell the person it's on its way).
 
 The tool never changes anything on the site: it only looks, scrolls, taps tabs and fills fields in the browser; buttons
