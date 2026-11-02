@@ -11,6 +11,9 @@ const SAFE = new Set(['GET', 'HEAD', 'OPTIONS']);
 const TRACKERS =
   /(googletagmanager|google-analytics|analytics\.google|googleadservices|doubleclick|google\.com\/(g|pagead)\/|firebaseinstallations|firebaselogging|firebase-settings|fcmregistrations|fcm\.googleapis|app-measurement|clarity\.ms|connect\.facebook|facebook\.com\/tr|hotjar|segment\.(io|com)|mixpanel|sentry\.io|hs-analytics|intercom)/i;
 
+// chat, support and review widgets: heavy, never part of what the person wants to show
+const WIDGETS = /(tawk\.to|crisp\.chat|zendesk|zopim|livechatinc|freshchat|freshworks|tidio|drift\.com|olark|purechat|smartsupp|chatra|jivosite|userlike|helpcrunch|wonderpush|onesignal|trustpilot\.com\/bootstrap|elfsight|youtube\.com\/embed|player\.vimeo)/i;
+
 export class CaptureStop extends Error {} // a reason to stop, in plain words for Claude to pass on
 
 export const DEVICES = {
@@ -110,7 +113,7 @@ export async function siteContext(browser, site, { device = 'phone', quality = '
     permissions: [],
   });
   const allow = (site.allow_writes_to ?? []).map((r) => new RegExp(r, 'i'));
-  const traffic = { requests: 0, writesBlocked: 0, writesAllowed: 0, trackersBlocked: 0, websocketsBlocked: 0, writesPassed: 0, passed: [] };
+  const traffic = { requests: 0, writesBlocked: 0, writesAllowed: 0, trackersBlocked: 0, heavyBlocked: 0, websocketsBlocked: 0, writesPassed: 0, passed: [] };
   const handled = new WeakSet();
   await context.route('**/*', (route) => {
     const req = route.request();
@@ -119,6 +122,13 @@ export async function siteContext(browser, site, { device = 'phone', quality = '
     traffic.requests++;
     if (TRACKERS.test(url)) {
       traffic.trackersBlocked++;
+      handled.add(req);
+      return route.abort();
+    }
+    // heavy things a screenshot doesn't need: chat and support widgets, and audio/video files (autoplaying videos
+    // cost a lot of memory). A site profile with keep_media: true keeps its videos.
+    if (WIDGETS.test(url) || (req.resourceType() === 'media' && !site.keep_media)) {
+      traffic.heavyBlocked++;
       handled.add(req);
       return route.abort();
     }
@@ -245,7 +255,7 @@ export async function openPage(context, site, url, { clock = false, warm = false
 }
 
 export const trafficLine = (t) =>
-  `Safety: ${t.writesBlocked} write(s) and ${t.trackersBlocked} tracker call(s) blocked${t.writesAllowed ? `, ${t.writesAllowed} allowed read(s)` : ''}, ${t.writesPassed} got through.`;
+  `Safety: ${t.writesBlocked} write(s) and ${t.trackersBlocked} tracker call(s) blocked${t.writesAllowed ? `, ${t.writesAllowed} allowed read(s)` : ''}, ${t.writesPassed} got through.${t.heavyBlocked ? ` ${t.heavyBlocked} heavy widget or video request(s) skipped, to save memory.` : ''}`;
 
 export function assertNoWrites(t) {
   if (t.writesPassed) throw new CaptureStop(`${t.writesPassed} write(s) reached the site (${t.passed[0]}), so this capture was thrown away. Tell the owner.`);

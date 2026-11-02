@@ -3,6 +3,7 @@
 // Chromium once into the tool's data folder.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { D, ROOT } from '../paths.mjs';
 
@@ -12,8 +13,18 @@ let idle = null;
 let how = null; // 'chrome' | 'msedge' | 'downloaded'
 // closed after 2 idle minutes, so its memory goes back to the laptop between jobs
 const IDLE_MS = 2 * 60 * 1000;
-// lighter on memory: a few shared page processes, nothing running in the background
-const ARGS = ['--renderer-process-limit=3', '--disable-background-networking', '--disable-component-update', '--disable-extensions', '--disable-default-apps'];
+// lighter on memory: nothing running in the background, no translate or casting
+const ARGS = ['--disable-background-networking', '--disable-component-update', '--disable-extensions', '--disable-default-apps', '--disable-features=Translate,MediaRouter,OptimizationHints'];
+// when the laptop is low on memory (under ~1.2 GB free): a single page process and a cap on each page's JavaScript
+// memory. Slower, but it fits. The choice is made at each launch, and the browser is relaunched after each job
+// while memory is low (memory.mjs), so it follows the laptop.
+const args = () => {
+  const free = os.freemem() / 1048576;
+  lean = free < 1200;
+  return lean ? [...ARGS, '--renderer-process-limit=1', '--js-flags=--max-old-space-size=512'] : [...ARGS, '--renderer-process-limit=3'];
+};
+let lean = false;
+export const isLean = () => lean;
 
 const playwright = () => import('playwright-core');
 
@@ -46,15 +57,16 @@ async function launch() {
   attempts.push(['chrome', { channel: 'chrome' }], ['msedge', { channel: 'msedge' }]);
   for (const [name, opts] of attempts) {
     try {
-      const b = await chromium.launch({ headless: true, args: ARGS, ...opts });
+      const b = await chromium.launch({ headless: true, args: args(), ...opts });
       how = name;
+      console.error(`[marketing-studio] browser started (${name}${lean ? ', lean: the laptop is low on memory' : ''}, ${Math.round(os.freemem() / 1048576)} MB free)`);
       return b;
     } catch {
       /* not on this laptop; try the next */
     }
   }
   await downloadBrowser();
-  const b = await chromium.launch({ headless: true, args: ARGS });
+  const b = await chromium.launch({ headless: true, args: args() });
   how = 'downloaded';
   return b;
 }

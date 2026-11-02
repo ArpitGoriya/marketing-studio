@@ -40,8 +40,18 @@ memory are written to its log. Claude Desktop puts that in `%LOCALAPPDATA%\Claud
 `[UtilityProcess stderr] [marketing-studio]`. Agent mode (Cowork) keeps its own record of calls out of reach, so
 this is where to look.
 
-**Memory.** Pages are walked only as far as needed (six screens for readings and recordings), opening a page has a
-one-minute limit, and the browser uses fewer processes and closes after two idle minutes. On an 8 GB laptop, Cowork
+**Memory: slower on a busy laptop, but it gets there** (`server/engine/memory.mjs`). Measured: the capture browser
+takes about 180 MB for a preview of the home page and 360 MB in high quality, and closing a page gives almost none of
+it back; only closing the browser does. So:
+- browser jobs take turns, one at a time (a second one says "waiting for the job before it to finish");
+- below 500 MB free, a job first closes the browser and waits up to 3 minutes for memory to come back;
+- below 1.2 GB free, the browser is launched lean (one page process, a cap on each page's JavaScript memory) and
+  closed after every job, so its memory goes straight back;
+- if the browser dies under a job anyway, the job starts a fresh one and runs again by itself
+  (`scripts/try-crash.mjs` kills it halfway through a recording: the recording still finishes);
+- chat and support widgets and audio/video files are skipped (a site profile with `keep_media: true` keeps videos).
+Pages are walked only as far as needed (six screens for readings and recordings), opening a page has a one-minute
+limit, and the browser closes after two idle minutes. On an 8 GB laptop, Cowork
 (which runs its own virtual machine), several Claude or VS Code windows, a big browser and games together leave too
 little: everything slows down and can stall. `status` shows the free memory and warns when it's low, and "still
 working" answers say so too. A normal chat needs no virtual machine, so it's the lighter choice here.
