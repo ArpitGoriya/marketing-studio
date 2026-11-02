@@ -76,6 +76,9 @@ Everything is also saved in **Documents → Marketing Studio → (your project n
 - Videos take a minute or two. Claude says "still working" and carries on by itself.
 - If it seems stuck for several minutes, type *reset Marketing Studio*: it stops what's running and starts fresh,
   without losing anything saved.
+- It needs free memory. Before a video, close what you don't need (extra browser tabs, games, other Claude
+  windows), and use a normal chat rather than Cowork, which needs a lot of memory of its own. Claude will say when
+  the laptop is low on memory.
 - It never changes anything on the site or app: it only looks, scrolls and fills in things like the calculator.
 - Pages behind the login show the demo account, never real customers.
 - Something odd? Tell Claude *it's not working*, or message the owner.

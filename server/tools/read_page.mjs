@@ -48,7 +48,7 @@ async function doRead(a, update, job) {
     const made = await siteContext(b, site, { device, quality: 'preview', loggedIn: !!a.logged_in });
     context = job.own(made.context);
     update(0.2, 'opening the page');
-    const page = await openPage(context, site, url, { warm: true, loggedIn: !!a.logged_in });
+    const page = await openPage(context, site, url, { warm: 6, loggedIn: !!a.logged_in });
     const notes = await runLive(page, site, a.steps ?? [], { touch: device === 'phone', onStep: (m) => update(undefined, m) });
     update(0.8, 'reading the page');
     const info = await page.evaluate(() => {

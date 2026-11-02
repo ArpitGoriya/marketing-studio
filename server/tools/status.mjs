@@ -27,6 +27,8 @@ export function registerStatus(server) {
     async () => {
       ensureDirs();
       const lines = [`Marketing Studio ${VERSION} (Node ${process.versions.node}, ${os.platform()} ${os.arch()}).`];
+      const free = os.freemem() / 1073741824;
+      lines.push(`Memory: ${free.toFixed(1)} GB free of ${(os.totalmem() / 1073741824).toFixed(1)} GB.${free < 0.7 ? ' That is low: captures and videos will be slow and may stall. Close other apps (browser tabs, games, other Claude windows) first.' : ''}`);
       const busy = runningJobs();
       if (busy.length) lines.push(`Busy: ${busy.map(busyLine).join('; ')}. Call wait for it; if one stays on the same step for minutes, call reset.`);
       try {

@@ -6,6 +6,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { closeBrowser } from './engine/browser.mjs';
+import { watchServer } from './engine/diagnostics.mjs';
+import { quietStderr, stdoutStream } from './engine/stdio.mjs';
 import { INSTRUCTIONS } from './instructions.mjs';
 import { VERSION } from './paths.mjs';
 import { registerBrand } from './tools/brand.mjs';
@@ -24,6 +26,8 @@ import { registerViewer, showsViewer } from './tools/viewer.mjs';
 import { registerWait } from './tools/wait.mjs';
 
 const server = new McpServer({ name: 'marketing-studio', title: 'Marketing Studio', version: VERSION }, { instructions: INSTRUCTIONS });
+// every call and any freeze go to the log (engine/diagnostics.mjs); it wraps the tools registered after it
+watchServer(server);
 registerStatus(server);
 registerGuide(server);
 registerFindPage(server);
@@ -46,6 +50,9 @@ const stop = async () => {
 };
 process.stdin.on('end', stop);
 process.on('SIGTERM', stop);
-await server.connect(new StdioServerTransport());
+// replies and log lines are written by a worker thread, so a slow reader can never freeze the extension
+// (engine/stdio.mjs); MS_DIRECT_STDIO=1 writes them directly, the old way, for comparison
+if (!process.env.MS_DIRECT_STDIO) quietStderr();
+await server.connect(process.env.MS_DIRECT_STDIO ? new StdioServerTransport() : new StdioServerTransport(process.stdin, stdoutStream()));
 console.error(`[marketing-studio] ${VERSION} ready`);
 server.server.oninitialized = () => console.error(`[marketing-studio] chat app: ${JSON.stringify(server.server.getClientVersion())}, shows the viewer: ${showsViewer(server)}`);

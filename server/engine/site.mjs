@@ -182,22 +182,25 @@ export const inMaintenance = (site, page) => {
   }
 };
 
+// a moment for the page to calm down: the network going quiet (8 s at most: pages with sliding banners or chat
+// widgets never go fully quiet), then a short pause
 export const settle = async (page, ms = 1200) => {
-  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(ms);
 };
 
-export async function waitImages(page, timeout = 15000) {
+export async function waitImages(page, timeout = 10000) {
   return page
     .waitForFunction(() => [...document.images].filter((i) => i.getBoundingClientRect().top < innerHeight * 3).every((i) => i.complete), null, { timeout })
     .then(() => true)
     .catch(() => false);
 }
 
-// walk the page so lazy images and infinite lists load, then back to the top
-export async function preScroll(page) {
-  const h = await page.evaluate(() => document.documentElement.scrollHeight);
-  for (let y = 0; y < Math.min(h, 20000); y += 600) {
+// walk the page so lazy images and infinite lists load, then back to the top. screens: how far (a whole long page
+// full of pictures takes a lot of memory, so readings and recordings only go as far as they need)
+export async function preScroll(page, { screens = Infinity } = {}) {
+  const { h, vh } = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, vh: innerHeight }));
+  for (let y = 0; y < Math.min(h, 20000, screens * vh); y += 600) {
     await page.evaluate((yy) => window.scrollTo(0, yy), y);
     await page.waitForTimeout(200);
   }
@@ -206,22 +209,38 @@ export async function preScroll(page) {
   await page.waitForTimeout(400);
 }
 
-// open a page ready to capture: loaded, settled, images in, not in maintenance, not bounced to a login page
+// open a page ready to capture: loaded, settled, images in, not in maintenance, not bounced to a login page.
+// warm: true walks the whole page first, a number only that many screens. All of it within a minute: a page that
+// takes longer stops with a picture of where it got to.
 export async function openPage(context, site, url, { clock = false, warm = false, loggedIn = false } = {}) {
   const page = await context.newPage();
   if (clock) await page.clock.install();
-  const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch((e) => {
-    throw new CaptureStop(`Couldn't open ${url}: ${String(e.message).split('\n')[0]}`);
-  });
-  if (res && res.status() >= 400) throw new CaptureStop(`${url} answered with an error (${res.status()}).`);
-  await settle(page);
-  if (inMaintenance(site, page)) throw new CaptureStop(`${site.name ?? site.id} is in maintenance mode right now (it shows ${site.maintenance_path}), so nothing was captured.`);
-  const out = site.login?.logged_out_when;
-  if (loggedIn && out?.text && (await page.getByText(out.text, { exact: false }).first().isVisible().catch(() => false))) {
-    throw new CaptureStop(`The page asked to sign in, so the demo account isn't signed in on this laptop. Check the demo account code in the extension's settings, or use sign_in with action "now".`);
+  let step = 'loading';
+  const open = async () => {
+    const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }).catch((e) => {
+      throw new CaptureStop(`Couldn't open ${url}: ${String(e.message).split('\n')[0]}`);
+    });
+    if (res && res.status() >= 400) throw new CaptureStop(`${url} answered with an error (${res.status()}).`);
+    step = 'settling';
+    await settle(page);
+    if (inMaintenance(site, page)) throw new CaptureStop(`${site.name ?? site.id} is in maintenance mode right now (it shows ${site.maintenance_path}), so nothing was captured.`);
+    const out = site.login?.logged_out_when;
+    if (loggedIn && out?.text && (await page.getByText(out.text, { exact: false }).first().isVisible().catch(() => false))) {
+      throw new CaptureStop(`The page asked to sign in, so the demo account isn't signed in on this laptop. Check the demo account code in the extension's settings, or use sign_in with action "now".`);
+    }
+    step = 'loading its pictures';
+    if (warm) await preScroll(page, warm === true ? {} : { screens: Number(warm) });
+    await waitImages(page);
+  };
+  let t;
+  try {
+    await Promise.race([open(), new Promise((_, no) => (t = setTimeout(() => no(new CaptureStop(`${url} didn't finish opening within 60 s (it was ${step}). The laptop may be short of memory: closing other apps helps. Try again, or use reset if things stay slow.`)), 60000)))]);
+  } catch (e) {
+    e.shot ??= await page.screenshot({ type: 'jpeg', quality: 55, scale: 'css', timeout: 5000 }).catch(() => null);
+    throw e;
+  } finally {
+    clearTimeout(t);
   }
-  if (warm) await preScroll(page);
-  await waitImages(page);
   return page;
 }
 

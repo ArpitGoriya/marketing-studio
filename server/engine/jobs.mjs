@@ -4,7 +4,14 @@
 // A job that runs past its limit is stopped: its browser pages are closed and it fails with what it was doing.
 // reset stops every running job at once.
 import { AsyncLocalStorage } from 'node:async_hooks';
+import os from 'node:os';
 import { CaptureStop } from './site.mjs';
+
+// a word on memory when it's low (diagnostics.mjs logs it; this tells Claude, who tells the person)
+const memoryNote = () => {
+  const free = os.freemem() / 1048576;
+  return free < 700 ? ` The laptop is low on memory (${Math.round(free)} MB free), which slows everything down: closing other apps (browser tabs, games, other Claude windows) helps.` : '';
+};
 
 const jobs = new Map();
 // the job whose work is running now, so browser pages opened anywhere inside it can be closed if it's stopped
@@ -85,7 +92,7 @@ export function jobAnswer(job, errorText) {
     content: [
       {
         type: 'text',
-        text: `Still working on it (${Math.round(job.progress * 100)}%, ${job.message}, ${secs} s so far). Call the wait tool with job "${job.id}" to get the result.`,
+        text: `Still working on it (${Math.round(job.progress * 100)}%, ${job.message}, ${secs} s so far). Call the wait tool with job "${job.id}" to get the result.${memoryNote()}`,
       },
     ],
   };

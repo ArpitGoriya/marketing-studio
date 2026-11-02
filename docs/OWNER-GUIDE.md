@@ -29,6 +29,23 @@ limit, and a step that fails or runs too long stops with which step it was and a
 moment. Every job has an overall limit too (4 min for a capture, 10 for a recording, 30 for a video export).
 `status` shows what's busy, and `reset` clears it.
 
+**Never frozen by a slow chat app.** On Windows, writing to the pipe Claude Desktop reads blocks the whole process
+until the app reads it. When the app is busy or the laptop is short of memory, that used to freeze the extension:
+`wait`, `status` and `reset` couldn't answer, and recordings stopped. Replies and log lines are now written by a
+small worker thread (`server/engine/stdio.mjs`), so the extension keeps running (`scripts/try-slow-reader.mjs`
+shows the difference: the old way froze for 7.8 s while the reader paused, the new way not at all).
+
+**What it was doing, afterwards.** Every tool call and how long it took, any moment the extension froze, and low
+memory are written to its log. Claude Desktop puts that in `%LOCALAPPDATA%\Claude\Logs\main.log`, as lines starting
+`[UtilityProcess stderr] [marketing-studio]`. Agent mode (Cowork) keeps its own record of calls out of reach, so
+this is where to look.
+
+**Memory.** Pages are walked only as far as needed (six screens for readings and recordings), opening a page has a
+one-minute limit, and the browser uses fewer processes and closes after two idle minutes. On an 8 GB laptop, Cowork
+(which runs its own virtual machine), several Claude or VS Code windows, a big browser and games together leave too
+little: everything slows down and can stall. `status` shows the free memory and warns when it's low, and "still
+working" answers say so too. A normal chat needs no virtual machine, so it's the lighter choice here.
+
 **Taps and typing report what they did**: "went to /vendors", "nothing changed (under the finger: ...)", "typed
 "mehendi", the field shows ...". Taps work by text, by a picture button's file name ("vendors" for the header's
 vendors.svg), by link (`{"href": "/vendors"}`) or by point (`{"x", "y"}`); `capture` with `numbers: true` numbers

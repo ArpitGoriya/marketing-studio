@@ -10,7 +10,10 @@ let shared = null;
 let launching = null;
 let idle = null;
 let how = null; // 'chrome' | 'msedge' | 'downloaded'
-const IDLE_MS = 5 * 60 * 1000;
+// closed after 2 idle minutes, so its memory goes back to the laptop between jobs
+const IDLE_MS = 2 * 60 * 1000;
+// lighter on memory: a few shared page processes, nothing running in the background
+const ARGS = ['--renderer-process-limit=3', '--disable-background-networking', '--disable-component-update', '--disable-extensions', '--disable-default-apps'];
 
 const playwright = () => import('playwright-core');
 
@@ -43,7 +46,7 @@ async function launch() {
   attempts.push(['chrome', { channel: 'chrome' }], ['msedge', { channel: 'msedge' }]);
   for (const [name, opts] of attempts) {
     try {
-      const b = await chromium.launch({ headless: true, ...opts });
+      const b = await chromium.launch({ headless: true, args: ARGS, ...opts });
       how = name;
       return b;
     } catch {
@@ -51,7 +54,7 @@ async function launch() {
     }
   }
   await downloadBrowser();
-  const b = await chromium.launch({ headless: true });
+  const b = await chromium.launch({ headless: true, args: ARGS });
   how = 'downloaded';
   return b;
 }

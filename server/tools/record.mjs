@@ -36,7 +36,7 @@ async function doRecord(a, update, job) {
       update(undefined, m);
     };
     update(0.02, 'opening the page');
-    const page = await openPage(context, site, url, { clock: !a.dry_run, warm: true, loggedIn: !!a.logged_in });
+    const page = await openPage(context, site, url, { clock: !a.dry_run, warm: 6, loggedIn: !!a.logged_in });
 
     // a dry run: every step for real but quickly, nothing filmed, so a target that's missing or a tap that does
     // nothing shows in seconds instead of after a long recording
