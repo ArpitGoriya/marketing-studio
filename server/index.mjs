@@ -50,9 +50,14 @@ const stop = async () => {
 };
 process.stdin.on('end', stop);
 process.on('SIGTERM', stop);
-// replies and log lines are written by a worker thread, so a slow reader can never freeze the extension
-// (engine/stdio.mjs); MS_DIRECT_STDIO=1 writes them directly, the old way, for comparison
-if (!process.env.MS_DIRECT_STDIO) quietStderr();
-await server.connect(process.env.MS_DIRECT_STDIO ? new StdioServerTransport() : new StdioServerTransport(process.stdin, stdoutStream()));
-console.error(`[marketing-studio] ${VERSION} ready`);
+// How replies leave. Claude Desktop runs extensions in an Electron utility process, where process.stdout is the app's
+// own message channel (writing to the raw pipe there isn't read as replies at all, which broke 1.4.1), so it's used
+// as it is. Run as a plain child process (other chat apps, the test scripts), writes to the OS pipe can freeze the
+// whole process on Windows while the reader is slow, so a worker thread writes them (engine/stdio.mjs).
+// MS_DIRECT_STDIO=1 forces the direct way.
+const inElectron = !!process.versions.electron || !!process.parentPort || process.type === 'utility';
+const direct = inElectron || !!process.env.MS_DIRECT_STDIO;
+if (!direct) quietStderr();
+await server.connect(direct ? new StdioServerTransport() : new StdioServerTransport(process.stdin, stdoutStream()));
+console.error(`[marketing-studio] ${VERSION} ready (replies: ${inElectron ? "the app's own channel" : direct ? 'direct' : 'writer thread'})`);
 server.server.oninitialized = () => console.error(`[marketing-studio] chat app: ${JSON.stringify(server.server.getClientVersion())}, shows the viewer: ${showsViewer(server)}`);

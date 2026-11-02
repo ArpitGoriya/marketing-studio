@@ -1,6 +1,6 @@
 {
   "name": "marketing-studio",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "description": "A Claude desktop extension that captures app and website screens (also behind a login) and exports Claude's own designs as images and videos.",
   "type": "module",
